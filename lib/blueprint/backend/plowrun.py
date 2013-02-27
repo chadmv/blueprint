@@ -3,7 +3,7 @@ import yaml
 import getpass
 import pprint
 
-import plow
+import plow.client as plow
 import blueprint
 import blueprint.conf as conf
 
