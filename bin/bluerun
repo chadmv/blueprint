@@ -2,9 +2,9 @@
 import sys
 import argparse
 
-import blueprint.app
+import blueprint
 
-class Bluerun(blueprint.app.Application):
+class Bluerun(blueprint.Application):
 
     def __init__(self):
         blueprint.app.Application.__init__(self,
@@ -21,7 +21,7 @@ class Bluerun(blueprint.app.Application):
 
     def handleArgs(self, args):
 
-        runner = blueprint.app.BlueprintRunner()
+        runner = blueprint.BlueprintRunner()
 
         if args.server:
             runner.setArg("server", args.server)
