@@ -1,0 +1,3 @@
+graft etc
+graft share
+global-include *.sh *.bp *.py
