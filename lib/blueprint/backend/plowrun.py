@@ -74,7 +74,7 @@ def serialize(runner):
                 task_layer.minRamMb = max(task_layer.minRamMb, task.getArg("ram"))
         
             task_layer.command = [
-                "%s/plow_wrapper.sh" % os.path.dirname(__file__),
+                "%s/env_wrapper.sh" % conf.get("env", "wrapper_script"),
                 "%s/bin/taskrun" % os.environ.get("PLOW_ROOT", "/usr/local"),
                 "-debug",
                 os.path.join(job.getPath(), "blueprint.yaml"),
@@ -95,7 +95,7 @@ def serialize(runner):
             lspec.range = layer.getArg("frame_range",
                 runner.getArg("frame_range", None))
             lspec.command = [
-                "%s/plow_wrapper.sh" % os.path.dirname(__file__),
+                "%s/env_wrapper.sh" % conf.get("env", "wrapper_script"),
                 "%s/bin/taskrun" % os.environ.get("PLOW_ROOT", "/usr/local"),
                 "-debug",
                 os.path.join(job.getPath(), "blueprint.yaml"),

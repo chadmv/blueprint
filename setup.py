@@ -32,17 +32,12 @@ setup(name='Blueprint',
 
       test_suite="tests.test_all",
 
-      package_data={
-        'blueprint': ['backend/*.sh'],
-      },
-
       data_files=[
-        ("/usr/local/etc/plow", ['etc/blueprint.cfg']),
-        # ("share/blueprint/examples", get_data('share/blueprint/examples/*'))
+        ('/usr/local/etc/blueprint', ['etc/blueprint.cfg', 'etc/env_wrapper.sh']),
       ],
 
       author='Matt Chambers',
       author_email='yougotrooted@gmail.com',
       url='https://github.com/sqlboy/blueprint',
-      description='A Python library for distributing computing in a VFX production environment.',
+      description='A Python library for distributing computing using the Plow Render Farm',
      )

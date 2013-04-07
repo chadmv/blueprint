@@ -10,6 +10,9 @@ export TMPDIR="$PLOW_TASK_TMPDIR"
 # Make sure it exists
 mkdir -p $PLOW_TASK_TEMPDIR
 
+# This is where you would add integration with your ENV system
+
+
 eval $@
 ret_code=$?
 
