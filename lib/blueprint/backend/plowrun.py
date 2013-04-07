@@ -17,14 +17,13 @@ def launch(runner):
     if runner.getArg("pretend"):
         pprint.pprint(spec)
     else:
-        job = plow.launch_job(spec)
+        job = spec.launch()
         runner.getJob().putData("jobid", job.id)
 
-
 def createLayerSpec(layer):
-    lspec = plow.LayerSpecT()
+    lspec = plow.LayerSpec()
     lspec.name = layer.getName()
-    lspec.tags =  layer.getArg("tags", ["unassigned"])
+    lspec.tags =  set(layer.getArg("tags", ["unassigned"]))
     lspec.chunk = layer.getArg("chunk", 1)
     lspec.minCores = layer.getArg("threads", 1)
     lspec.maxCores = layer.getArg("max_threads", 0)
@@ -41,7 +40,7 @@ def serialize(runner):
     job_name = conf.get("templates", "job_name", JOB_NAME=base_name)
     log_dir = conf.get("templates", "log_dir", JOB_NAME=base_name)
     
-    spec = plow.JobSpecT()
+    spec = plow.JobSpec()
     spec.project = os.environ.get("PLOW_PROJECT",
         conf.get("defaults", "project"))
     spec.username = getpass.getuser()
@@ -57,6 +56,8 @@ def serialize(runner):
     for layer in job.getLayers():
 
         if isinstance(layer, (blueprint.Task,)):
+
+            print "TASK"
 
             # Have to create a plow layer to store blueprint tasks.
             # This would be to org
@@ -74,7 +75,7 @@ def serialize(runner):
                 task_layer.minRamMb = max(task_layer.minRamMb, task.getArg("ram"))
         
             task_layer.command = [
-                "%s/env_wrapper.sh" % conf.get("env", "wrapper_script"),
+                conf.get("env", "wrapper_script"),
                 "%s/bin/taskrun" % os.environ.get("PLOW_ROOT", "/usr/local"),
                 "-debug",
                 os.path.join(job.getPath(), "blueprint.yaml"),
@@ -82,20 +83,20 @@ def serialize(runner):
                 "%{TASK}"
             ]
 
-            task = plow.TaskSpecT()
+            task = plow.TaskSpec()
             task.name = layer.getName()
             task.depends = setupTaskDepends(job, layer) 
             task_layer.tasks.append(task)
             spec.layers.append(task_layer)
 
         else:
-
             lspec = createLayerSpec(layer)
             lspec.depends = setupLayerDepends(job, layer)
-            lspec.range = layer.getArg("frame_range",
-                runner.getArg("frame_range", None))
+            lspec.range = str(layer.getArg("frame_range",
+                runner.getArg("frame_range", "1000")))
+            print lspec.range
             lspec.command = [
-                "%s/env_wrapper.sh" % conf.get("env", "wrapper_script"),
+                conf.get("env", "wrapper_script"),
                 "%s/bin/taskrun" % os.environ.get("PLOW_ROOT", "/usr/local"),
                 "-debug",
                 os.path.join(job.getPath(), "blueprint.yaml"),
@@ -112,7 +113,7 @@ def serialize(runner):
 def setupLayerDepends(job, layer):
     result = []
     for depend in layer.getDepends():
-        dspec = plow.DependSpecT()
+        dspec = plow.DependSpec()
         
         depend_on = job.getLayer(str(depend.dependOn))
         if isinstance(depend_on, (blueprint.Task,)):
@@ -142,7 +143,7 @@ def setupTaskDepends(job, task):
     """
     result = []
     for depend in task.getDepends():
-        dspec = plow.DependSpecT()
+        dspec = plow.DependSpec()
         depend_on = job.getLayer(str(depend.dependOn))
         if isinstance(depend_on, (blueprint.Task,)):
             # Task on Task
