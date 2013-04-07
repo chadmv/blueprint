@@ -88,12 +88,19 @@ class PluginManager(object):
 
 class Application(object):
     def __init__(self, descr):
+
+        self._runner = blueprint.BlueprintRunner()
+
         self._argparser = argparse.ArgumentParser(description=descr)
         group = self._argparser.add_argument_group("Logging Options")
         group.add_argument("-verbose", action="store_true",
             help="Turn on verbose logging.")
         group.add_argument("-debug", action="store_true",
             help="Turn on debug logging.")
+        group.add_argument("-host", metavar="HOSTNAME",
+            help="Specify the server to communicate with, if any.")
+        group.add_argument("-backend", metavar="BACKEND",
+            help="Specify the queuing backend plugin.")
 
     def handleArgs(self, args):
         pass
@@ -101,10 +108,16 @@ class Application(object):
     def go(self):
         args = self._argparser.parse_args()
 
+        # Handle the common arguments.
         if args.verbose:
             logging.basicConfig(level=logging.INFO)
         if args.debug:
             logging.basicConfig(level=logging.DEBUG)
+        
+        if args.server:
+            self._runner.setArg("host", args.host)
+        if args.backend:
+            self._runner.setArg("backend", args.backend)
 
         # Handle arguments added by specific application.
         self.handleArgs(args)
@@ -113,11 +126,16 @@ class BlueprintRunner(object):
 
     def __init__(self, **kwargs):
         self.__args = {
-            "paused": False
+            "host": None, 
+            "pause": False,
+            "backend": None,
+            "name": None,
+            "pretend": False,
+            "script": None,
+            "frame_range": None
         }
         self.__args.update(kwargs)
         self.__job = None
-
 
     def setArg(self, key, value):
         self.__args[key] = value
@@ -129,16 +147,10 @@ class BlueprintRunner(object):
         # Load the backend module
         backend = loadBackendPlugin(self.getArg("backend",
             conf.get("defaults", "backend")))
-        backend.launch(self)
+        return backend.launch(self)
 
     def setup(self):
         return self.getJob().setup()
-
-    def setJob(self, job):
-        """ Set Job.Current
-        """
-        self.__job = job
-        return
 
     def getJob(self):
         if not self.__job:

@@ -19,6 +19,7 @@ def launch(runner):
     else:
         job = spec.launch()
         runner.getJob().putData("jobid", job.id)
+        return job
 
 def createLayerSpec(layer):
     lspec = plow.LayerSpec()
@@ -36,7 +37,7 @@ def serialize(runner):
     Convert the job from the internal blueprint stucture to a plow JobSpec.
     """
     job = runner.getJob()
-    base_name = runner.getArg("job_name", job.getName())
+    base_name = runner.getArg("name", job.getName())
     job_name = conf.get("templates", "job_name", JOB_NAME=base_name)
     log_dir = conf.get("templates", "log_dir", JOB_NAME=base_name)
     
@@ -45,7 +46,7 @@ def serialize(runner):
         conf.get("defaults", "project"))
     spec.username = getpass.getuser()
     spec.uid = os.getuid()
-    spec.paused = runner.getArg("pasued")
+    spec.paused = runner.getArg("pasue")
     spec.name =  job_name
     spec.logPath = log_dir
     spec.layers = []
@@ -56,9 +57,6 @@ def serialize(runner):
     for layer in job.getLayers():
 
         if isinstance(layer, (blueprint.Task,)):
-
-            print "TASK"
-
             # Have to create a plow layer to store blueprint tasks.
             # This would be to org
             if not task_layers.has_key(layer.getArg("group")):
@@ -73,12 +71,14 @@ def serialize(runner):
                 task_layer.minCores = max(task_layer.minCores, task.getArg("threads", 1))
                 task_layer.maxCores = max(task_layer.maxCores, task.getArg("max_threads", 0))
                 task_layer.minRamMb = max(task_layer.minRamMb, task.getArg("ram"))
+                task_layer.range = layer.getArg("frame_range", runner.getArg("frame_range", "1000"))
         
             task_layer.command = [
                 conf.get("env", "wrapper_script"),
                 "%s/bin/taskrun" % os.environ.get("PLOW_ROOT", "/usr/local"),
                 "-debug",
                 os.path.join(job.getPath(), "blueprint.yaml"),
+                "%{RANGE}",
                 "-task",
                 "%{TASK}"
             ]
@@ -92,18 +92,17 @@ def serialize(runner):
         else:
             lspec = createLayerSpec(layer)
             lspec.depends = setupLayerDepends(job, layer)
-            lspec.range = str(layer.getArg("frame_range",
-                runner.getArg("frame_range", "1000")))
+            lspec.range = layer.getArg("frame_range", 
+                runner.getArg("frame_range", "1000"))
             print lspec.range
             lspec.command = [
                 conf.get("env", "wrapper_script"),
                 "%s/bin/taskrun" % os.environ.get("PLOW_ROOT", "/usr/local"),
+                "%{RANGE}"
                 "-debug",
                 os.path.join(job.getPath(), "blueprint.yaml"),
                 "-layer",
-                layer.getName(),
-                "-range",
-                "%{RANGE}"
+                layer.getName()
             ]
             spec.layers.append(lspec)
 

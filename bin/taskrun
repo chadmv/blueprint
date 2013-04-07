@@ -13,12 +13,12 @@ class Taskrun(blueprint.Application):
             "Taskrun - Blueprint task execution tool")
         group = self._argparser.add_argument_group("Taskrun Options")
         
-        group.add_argument("script", metavar="SCRIPT",
-            help="Path to blueprint script.")
+        group.add_argument("script", metavar="SCRIPT", help="Path to blueprint script.")
+        group.add_argument("range", metavar="FRAME_RANGE", help="Frame range.", default="1001")
+
         group.add_argument("-layer", metavar="LAYER", 
             help="Layer to execute task from.")
-        group.add_argument("-range", metavar="RANGE",
-            help="Frame range to execute.");
+
         group.add_argument("-task", metavar="TASK",
             help="Task to execute.");
 
@@ -26,7 +26,7 @@ class Taskrun(blueprint.Application):
         job = blueprint.loadScript(args.script)
         
         try:
-            if args.layer and args.range:
+            if args.layer:
                 layer = job.getLayer(args.layer)
                 frameset = fileseq.FrameSet(args.range)
                 layer.execute(frameset)

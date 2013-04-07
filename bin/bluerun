@@ -8,34 +8,30 @@ class Bluerun(blueprint.Application):
 
     def __init__(self):
         blueprint.app.Application.__init__(self,
-            "Bluerun - Blueprint launch and execution tool.")
+            "Bluerun - Blueprint script launch tool.")
 
-        group = self._argparser.add_argument_group("Bluerun Options")
-        group.add_argument("-server", metavar="HOSTNAME", help="Specify the server to communicate with, if any.")
-        group.add_argument("-backend", metavar="BACKEND", help="Specify the queuing backend plugin.")
+        group = self._argparser.add_argument_group("Script Options")
         group.add_argument("script", metavar="SCRIPT", help="Path to blueprint script.")
         group.add_argument("range", metavar="FRAME_RANGE", help="Frame range.")
-        group.add_argument("-pause", action="store_true", help="Launch the job in a paused state.")
-        group.add_argument("-job-name", metavar="JOB NAME", help="Set the job name.")
-        group.add_argument("-pretend", action="store_true", help="Do everything except launch the job.")
+
+        job_group = self._argparser.add_argument_group("Job Options")
+        job_group.add_argument("-pause", action="store_true", help="Launch the job in a paused state.")
+        job_group.add_argument("-name", metavar="NAME", help="Set the job name.")
+        job_group.add_argument("-pretend", action="store_true", help="Do everything except launch the job.")
 
     def handleArgs(self, args):
 
         runner = blueprint.BlueprintRunner()
 
-        if args.server:
-            runner.setArg("server", args.server)
-        if args.backend:
-            runner.setArg("backend", args.backend)
         if args.pause:
-            runner.setArg("pause", args.pause)
+            self._runner.setArg("pause", args.pause)
         if args.job_name:
-            runner.setArg("job_name", args.job_name)
+            self._runner.setArg("name", args.name)
         if args.pretend:
-            runner.setArg("pretend", args.pretend)
+            self._unner.setArg("pretend", args.pretend)
 
-        runner.setArg("script", args.script)
-        runner.setArg("frame_range", args.range)
+        self._runner.setArg("script", args.script)
+        self._runner.setArg("frame_range", args.range)
         runner.launch()
 
 if __name__ == "__main__":
