@@ -34,7 +34,7 @@ class Taskrun(blueprint.Application):
                 task = job.getLayer(args.task)
                 task.execute()
             else:
-                raise Exception("Unsupported operation, must specify layer/range or task.")
+                raise Exception("Unsupported operation, must specify -layer or -task")
 
         except CommandException, e:
             print >> sys.stderr, "%s\n" % e
