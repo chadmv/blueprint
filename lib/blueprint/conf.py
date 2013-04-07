@@ -13,7 +13,7 @@ def _init():
         cfgs = Parser.read([os.environ["BLUEPRINT_CFG"]])
     else:
         cfgs = Parser.read([
-            os.path.join(os.environ.get("PLOW_ROOT", "/usr/local"), "etc/plow/blueprint.cfg"),
+            os.path.join(os.environ.get("PLOW_ROOT", "/usr/local"), "etc/blueprint/blueprint.cfg"),
             os.path.expanduser("~/.plow/blueprint.cfg")])
     assert(cfgs)
 
