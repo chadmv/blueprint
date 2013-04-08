@@ -89,7 +89,7 @@ class PluginManager(object):
 class Application(object):
     def __init__(self, descr):
 
-        self._runner = blueprint.BlueprintRunner()
+        self._runner = BlueprintRunner()
 
         self._argparser = argparse.ArgumentParser(description=descr)
         group = self._argparser.add_argument_group("Logging Options")
@@ -114,7 +114,7 @@ class Application(object):
         if args.debug:
             logging.basicConfig(level=logging.DEBUG)
         
-        if args.server:
+        if args.host:
             self._runner.setArg("host", args.host)
         if args.backend:
             self._runner.setArg("backend", args.backend)

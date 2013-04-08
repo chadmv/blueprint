@@ -25,7 +25,7 @@ class Bluerun(blueprint.Application):
 
         if args.pause:
             self._runner.setArg("pause", args.pause)
-        if args.job_name:
+        if args.name:
             self._runner.setArg("name", args.name)
         if args.pretend:
             self._unner.setArg("pretend", args.pretend)
