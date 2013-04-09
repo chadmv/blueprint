@@ -21,8 +21,6 @@ class Bluerun(blueprint.Application):
 
     def handleArgs(self, args):
 
-        runner = blueprint.BlueprintRunner()
-
         if args.pause:
             self._runner.setArg("pause", args.pause)
         if args.name:
@@ -32,7 +30,7 @@ class Bluerun(blueprint.Application):
 
         self._runner.setArg("script", args.script)
         self._runner.setArg("frame_range", args.range)
-        runner.launch()
+        self._runner.launch()
 
 if __name__ == "__main__":
     app = Bluerun()
