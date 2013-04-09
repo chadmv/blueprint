@@ -94,11 +94,10 @@ def serialize(runner):
             lspec.depends = setupLayerDepends(job, layer)
             lspec.range = layer.getArg("frame_range", 
                 runner.getArg("frame_range", "1000"))
-            print lspec.range
             lspec.command = [
                 conf.get("env", "wrapper_script"),
                 "%s/bin/taskrun" % os.environ.get("PLOW_ROOT", "/usr/local"),
-                "%{RANGE}"
+                "%{RANGE}",
                 "-debug",
                 os.path.join(job.getPath(), "blueprint.yaml"),
                 "-layer",
