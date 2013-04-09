@@ -6,6 +6,8 @@ import yaml
 
 import conf
 
+from exception import BlueprintException
+
 logger = logging.getLogger(__name__)
 
 __all__ = [
@@ -112,6 +114,7 @@ class Application(object):
         if args.verbose:
             logging.basicConfig(level=logging.INFO)
         if args.debug:
+            print "turning on debug logging"
             logging.basicConfig(level=logging.DEBUG)
         
         if args.host:
@@ -128,7 +131,7 @@ class BlueprintRunner(object):
         self.__args = {
             "host": None, 
             "pause": False,
-            "backend": None,
+            "backend": conf.get("defaults", "backend"),
             "name": None,
             "pretend": False,
             "script": None,
@@ -141,12 +144,22 @@ class BlueprintRunner(object):
         self.__args[key] = value
 
     def getArg(self, key, default=None):
-        return self.__args.get(key, default)
+        try:
+            return self.__args[key]
+        except KeyError:
+            return default
 
     def launch(self):
-        # Load the backend module
-        backend = loadBackendPlugin(self.getArg("backend",
-            conf.get("defaults", "backend")))
+
+        logger.debug("Blueprint runner args:")
+        logger.debug(self.__args)
+
+        backend_module = self.getArg("backend")
+        if not backend_module:
+            raise BlueprintException("No backend moudle is set, see defaults.backend setting in config.")
+        
+        logging.debug("Launching job with backend: %s" % backend_module)
+        backend = loadBackendPlugin(backend_module)
         return backend.launch(self)
 
     def setup(self):
