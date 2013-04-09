@@ -46,7 +46,7 @@ def serialize(runner):
         conf.get("defaults", "project"))
     spec.username = getpass.getuser()
     spec.uid = os.getuid()
-    spec.paused = runner.getArg("pasue")
+    spec.paused = runner.getArg("pause")
     spec.name =  job_name
     spec.logPath = log_dir
     spec.layers = []
@@ -61,7 +61,7 @@ def serialize(runner):
             # This would be to org
             if not task_layers.has_key(layer.getArg("group")):
                 task_layer = createLayerSpec(layer)
-                task_layer.name = layer.getArg("group")
+                task_layer.name = layer.getArg("group", "default")
                 task_layer.tasks = []
             else:
                 task_layer = task_layers[layer.getGroup()]
