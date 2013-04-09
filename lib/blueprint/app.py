@@ -114,7 +114,6 @@ class Application(object):
         if args.verbose:
             logging.basicConfig(level=logging.INFO)
         if args.debug:
-            print "turning on debug logging"
             logging.basicConfig(level=logging.DEBUG)
         
         if args.host:
