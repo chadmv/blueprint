@@ -13,8 +13,8 @@ def _init():
         cfgs = Parser.read([os.environ["BLUEPRINT_CFG"]])
     else:
         cfgs = Parser.read([
-            os.path.join(os.environ.get("PLOW_ROOT", "/usr/local"), "etc/blueprint/blueprint.cfg"),
-            os.path.expanduser("~/.plow/blueprint.cfg")])
+            os.path.join(os.environ.get("BLUEPRINT_ROOT", "/usr/local"), "etc/blueprint/blueprint.cfg"),
+            os.path.expanduser("~/.blueprint/blueprint.cfg")])
     assert(cfgs)
 
 # run as a function to avoid polluting module with temp variables
