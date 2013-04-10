@@ -25,7 +25,7 @@ def get_data(*paths):
 setup(name='Blueprint',
       version='0.1',
 
-      package_dir = {'blueprint': 'lib/blueprint'},
+      package_dir = {'': 'lib', 'tests':'tests'},
       packages=find_packages('lib') + find_packages(),
 
       scripts=glob.glob("bin/*"),
