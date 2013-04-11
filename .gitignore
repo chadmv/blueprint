@@ -2,3 +2,4 @@
 Blueprint.egg-info
 build
 lib/Distutils.egg-info
+dist
