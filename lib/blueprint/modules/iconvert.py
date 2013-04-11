@@ -6,8 +6,6 @@ import os
 from blueprint.layer import Layer
 from blueprint.layer import Task
 
-import blueprint.conf as conf
-
 class IConvert(Layer):
     """ Layer to batch iconvert
     """
@@ -44,7 +42,7 @@ class IConvert(Layer):
 
     def build_command(self):
         """ Build iconvert command options """
-        cmd = [conf.get("Iconvert", "bin")]
+        cmd = ["iconvert"]
 
         supported_options = ["v", "threads", "d", "g", "tile", "scanline", "compression",
                              "quality", "no_copy_image", "adjust_time", "caption",

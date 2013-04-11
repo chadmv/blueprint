@@ -3,8 +3,6 @@ import os
 import subprocess
 import json
 
-import blueprint.conf as conf
-
 from blueprint.layer import Layer, SetupTask
 
 class BlenderSetup(SetupTask):
@@ -19,7 +17,7 @@ class BlenderSetup(SetupTask):
 
         layer = self.getLayer()
 
-        cmd = [conf.get("Blender", "bin")]
+        cmd = ["blender"]
         cmd.append("-b")
         cmd.append(layer.getInput("scene_file").path)
         cmd.append("--python")
@@ -50,7 +48,7 @@ class Blender(Layer):
 
     def _execute(self, frames):
 
-        cmd = [conf.get("Blender", "bin")]
+        cmd = ["blender"]
         cmd.append("-b")
         cmd.append(self.getInput("scene_file").path)
         cmd.append("-noaudio")
