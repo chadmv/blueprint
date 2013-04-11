@@ -24,12 +24,14 @@ class Archive(object):
         self.__make()
 
     def __make(self):
+        logger.debug("Using archive path: %s" % self.__path)
         os.makedirs(self.__path, 0777)
         os.mkdir(os.path.join(self.__path, "layers"), 0777)
 
     def putData(self, name, data, layer=None):
         """Puts data into the archive."""
-        path = os.path.join(self.getPath(layer), name);
+        path = os.path.join(self.getPath(layer), name)
+        logger.debug("Witing out data %s to path %s" % (name, path))
         fp = open(path, "w")
         try:
             fp.write(yaml.dump(data))
