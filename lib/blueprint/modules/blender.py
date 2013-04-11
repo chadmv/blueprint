@@ -2,8 +2,11 @@
 import os
 import subprocess
 import json
+import logging
 
 from blueprint.layer import Layer, SetupTask
+
+logger = logging.getLogger(__file__)
 
 class BlenderSetup(SetupTask):
     """
@@ -13,7 +16,7 @@ class BlenderSetup(SetupTask):
     def __init__(self, layer, **kwargs):
         SetupTask.__init__(self, layer, **kwargs)
 
-    def _execute(self):
+    def _execute(self, *args):
 
         layer = self.getLayer()
 
@@ -28,6 +31,7 @@ class BlenderSetup(SetupTask):
         os.environ["PLOW_BLENDER_SETUP_PATH"] = output_path
         self.system(cmd)
 
+        logger.info("Loading blender ouputs from: %s" % output_path)
         outputs = json.load(open(output_path, "r"))
         for output in outputs:
             layer.addOutput(output["pass"], output["path"], output)
