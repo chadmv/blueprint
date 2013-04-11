@@ -38,8 +38,8 @@ def serialize(runner):
     """
     job = runner.getJob()
     base_name = runner.getArg("name", job.getName())
-    job_name = conf.get("templates", "job_name", JOB_NAME=base_name)
-    log_dir = conf.get("templates", "log_dir", JOB_NAME=base_name)
+    job_name = conf.get("defaults", "job_name", JOB_NAME=base_name)
+    log_dir = conf.get("defaults", "log_dir", JOB_NAME=base_name)
     
     spec = plow.JobSpec()
     spec.project = os.environ.get("PLOW_PROJECT",

@@ -19,7 +19,7 @@ class Archive(object):
     def __init__(self, job):
         self.__job = job
         self.__path = "-".join(
-            (conf.get("templates", "archive_dir", JOB_NAME=job.getName()),
+            (conf.get("defaults", "archive_dir", JOB_NAME=job.getName()),
             "-%s" % uuid.uuid4()))
         self.__make()
 
