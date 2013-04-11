@@ -81,13 +81,11 @@ class Layer(object):
         return self.__job
 
     def putData(self, name, data):
-        self.__job.getArchive().putData(
-            "%s/%s" % (self.__name, name), data)
+        self.__job.getArchive().putData(name, data, self)
 
     def getData(self, name):
-        self.__job.getArchive().getData(
-            "%s/%s" % (self.__name, name))
-
+        return self.__job.getArchive().getData(name, data, self)
+        
     def setJob(self, job):
         self.__job = job
 
@@ -108,6 +106,7 @@ class Layer(object):
 
     def addOutput(self, name, path, attrs=None):
         self.__outputs[name] = Io(name, path, attrs)
+        self.putData("outputs", self.__outputs)
 
     def getSetupTasks(self):
         return list(self.__setups)
