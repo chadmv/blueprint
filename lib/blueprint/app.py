@@ -124,14 +124,20 @@ class Application(object):
         # Handle arguments added by specific application.
         self.handleArgs(args)
 
+
+# A simple object to use as a BlueprintRunner.getArg() default
+# value rather than None, which could be a valid value.
+LoadDefault = object()
+
 class BlueprintRunner(object):
 
     def __init__(self, **kwargs):
-        self.__args = {
+        self.__args = {}
+        self.__defaults = {
             "host": None, 
             "pause": False,
             "backend": conf.get("defaults", "backend"),
-            "name": None,
+            "name": "",
             "pretend": False,
             "script": None,
             "frame_range": None
@@ -142,10 +148,12 @@ class BlueprintRunner(object):
     def setArg(self, key, value):
         self.__args[key] = value
 
-    def getArg(self, key, default=None):
+    def getArg(self, key, default=LoadDefault):
         try:
             return self.__args[key]
         except KeyError:
+            if default is LoadDefault:
+                return self.__defaults.get(key)
             return default
 
     def launch(self):
