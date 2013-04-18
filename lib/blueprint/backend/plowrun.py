@@ -50,16 +50,14 @@ def serialize(runner):
     spec.name =  job_name
     spec.logPath = log_dir
     spec.layers = []
+    spec.env = { 
+        "BLUEPRINT_SCRIPTS_PATH": conf.get("defaults", "scripts_path"),
+        "BLUEPRINT_ARCHIVE": job.getPath()
+    }
 
     # Task layers get created to store blueprint tasks.
     task_layers = { }
 
-    root = os.environ.get("BLUEPRINT_ROOT")
-    if root:
-        taskrun = os.path.join(root, "bin/taskrun")
-    else:
-        taskrun = "taskrun"
-                
     for layer in job.getLayers():
 
         if isinstance(layer, (blueprint.Task,)):
@@ -80,8 +78,8 @@ def serialize(runner):
                 task_layer.range = layer.getArg("frame_range", runner.getArg("frame_range", "1000"))
             
             task_layer.command = [
-                conf.get("env", "wrapper_script"),
-                taskrun,
+                conf.get("defaults", "scripts_path") + "/env_wrapper.sh",
+                "taskrun",
                 "-debug",
                 os.path.join(job.getPath(), "blueprint.yaml"),
                 "%{RANGE}",
@@ -101,8 +99,8 @@ def serialize(runner):
             lspec.range = layer.getArg("frame_range", 
                 runner.getArg("frame_range", "1000"))
             lspec.command = [
-                conf.get("env", "wrapper_script"),
-                taskrun,
+                conf.get("defaults", "scripts_path") + "/env_wrapper.sh",
+                "taskrun",
                 "%{RANGE}",
                 "-debug",
                 os.path.join(job.getPath(), "blueprint.yaml"),
