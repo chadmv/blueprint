@@ -40,6 +40,13 @@ class PluginManager(object):
         cls.loaded.append(plugin)
 
     @classmethod
+    def runPreLaunch(cls, spec):
+        logger.debug("Running pre-launch plugins on spec: %s" % spec)
+        for plugin in cls.loaded:
+            if getattr(plugin, "preLaunch", False):
+                plugin.preLaunch(spec)
+
+    @classmethod
     def runAfterInit(cls, layer):
         logger.debug("Running after init plugins on %s" % layer)
         for plugin in cls.loaded:
@@ -167,7 +174,15 @@ class BlueprintRunner(object):
         
         logging.debug("Launching job with backend: %s" % backend_module)
         backend = loadBackendPlugin(backend_module)
-        return backend.launch(self)
+
+        self.setup()
+        spec = backend.serialize(self)
+        PluginManager.runPreLaunch(spec)
+        
+        if self.getArg("pretend"):
+            pprint.pprint(spec)
+        else:
+            backend.launch(self, spec)
 
     def setup(self):
         return self.getJob().setup()

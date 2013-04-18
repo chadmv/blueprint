@@ -7,19 +7,13 @@ import plow.client as plow
 import blueprint
 import blueprint.conf as conf
 
-def launch(runner):
+def launch(runner, spec):
     """
-    Main entry point to launch plugin.
+    Launch the given job spec to plow.
     """
-    runner.setup()
-    spec = serialize(runner)
-
-    if runner.getArg("pretend"):
-        pprint.pprint(spec)
-    else:
-        job = spec.launch()
-        runner.getJob().putData("jobid", job.id)
-        return job
+    job = spec.launch()
+    runner.getJob().putData("jobid", job.id)
+    return job
 
 def createLayerSpec(layer):
     lspec = plow.LayerSpec()
