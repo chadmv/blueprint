@@ -10,6 +10,7 @@ class Init:
     Setup = False
     BeforeExecute = False
     AfterExecute = False
+    PreLaunch = False
 
 def initLayer(layer):
     logger.info("initializing %s plugin on layer %s" % (__name__, layer))
