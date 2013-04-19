@@ -18,15 +18,22 @@ class Bluerun(blueprint.Application):
         job_group.add_argument("-pause", action="store_true", help="Launch the job in a paused state.")
         job_group.add_argument("-name", metavar="NAME", help="Set the job name.")
         job_group.add_argument("-pretend", action="store_true", help="Do everything except launch the job.")
+        job_group.add_argument("-env", action="append", default=list(), 
+            help="Set an environment variable to be present in every task. (name=value)")
 
     def handleArgs(self, args):
-
         if args.pause:
             self._runner.setArg("pause", args.pause)
         if args.name:
             self._runner.setArg("name", args.name)
         if args.pretend:
-            self._unner.setArg("pretend", args.pretend)
+            self._runner.setArg("pretend", args.pretend)
+        if args.env:
+            current_env = self._runner.getArg("env")
+            for pair in args.env:
+                key, value = pair.split("=", 1)
+                current_env[key] = value
+            self._runner.setArg("env", current_env)
 
         self._runner.setArg("script", args.script)
         self._runner.setArg("frame_range", args.range)

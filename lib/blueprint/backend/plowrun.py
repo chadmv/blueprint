@@ -48,6 +48,7 @@ def serialize(runner):
         "BLUEPRINT_SCRIPTS_PATH": conf.get("defaults", "scripts_path"),
         "BLUEPRINT_ARCHIVE": job.getPath()
     }
+    spec.env.update(runner.getArg("env"))
 
     # Task layers get created to store blueprint tasks.
     task_layers = { }
