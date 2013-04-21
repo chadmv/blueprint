@@ -33,7 +33,7 @@ setup(name='Blueprint',
       test_suite="tests.test_all",
 
       data_files=[
-        ('/usr/local/etc/blueprint', ['etc/blueprint.cfg', 'etc/env_wrapper.sh']),
+        ('/usr/local/etc/blueprint', glob.glob('etc/*')),
       ],
 
       author='Matt Chambers',
