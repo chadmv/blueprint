@@ -54,16 +54,13 @@ setup(name='Blueprint',
 
       package_dir = {'': 'lib', 'tests':'tests'},
       packages=find_packages('lib') + find_packages(),
+      zip_safe=False,
 
       scripts=glob.glob("bin/*"),
 
       cmdclass={"post_install": PostInstallCommand},
 
       test_suite="tests.test_all",
-
-      # data_files=[
-      #   ('/usr/local/etc/blueprint', glob.glob('etc/*')),
-      # ],
 
       author='Matt Chambers',
       author_email='yougotrooted@gmail.com',
