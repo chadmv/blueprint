@@ -6,50 +6,41 @@ import glob
 import shutil
 import logging
 from setuptools import setup, find_packages, Command
+from setuptools.command.install import install as _install
+from distutils import log
 
 
-ETC_DST = "/usr/local/etc/blueprint"
+ETC_INSTALL_DIR = "/usr/local/etc/blueprint"
 
 
-class PostInstallCommand(Command):
-
-    description = "Run the post-install process"
-    user_options = [  ]
-
-    def initialize_options(self):
-        self.__src_paths = set()
-        self.__exist_paths = set()
-        self.__src = "etc"
-        self.__dst = ETC_DST
-
-        for name in os.listdir(self.__src):
-            src_path = os.path.join(self.__src, name)
-            dst_path = os.path.join(self.__dst, name)
-            if not os.path.exists(dst_path):
-                self.__src_paths.add((src_path, dst_path))
-            else:
-                self.__exist_paths.add(dst_path)
-
-    def finalize_options(self):
-        pass
+class InstallCommand(_install):
 
     def run(self):
-        for p in self.__exist_paths:
-            self.announce("{0} already exists".format(p), logging.INFO)
+        _install.run(self)
 
-        for src, dst in self.__src_paths:
-            dirname, name = os.path.split(dst)
-            
-            if not os.path.exists(dirname):
-                os.makedirs(dirname)
+        self.announce("Running post-install", log.INFO)
 
-            self.announce("Copying {0} to {1}".format(name, dst), logging.INFO)
-            self.copy_file(src, dst)  
+        src_paths = set()
+        exist_paths = set()
+        src = "etc"
+        dst = ETC_INSTALL_DIR
+
+        if not os.path.exists(dst):
+            os.makedirs(dst)
+
+        for name in os.listdir(src):
+            src_path = os.path.join(src, name)
+            dst_path = os.path.join(dst, name)
+
+            if not os.path.exists(dst_path):
+                self.copy_file(src_path, dst_path)  
+            else:
+                self.announce("{0} already exists".format(dst_path), log.INFO)
 
 #
 # Setup
 #
-setup(name='Blueprint',
+setup(name='plow-blueprint',
       version='0.1.1',
 
       package_dir = {'': 'lib', 'tests':'tests'},
@@ -58,7 +49,7 @@ setup(name='Blueprint',
 
       scripts=glob.glob("bin/*"),
 
-      cmdclass={"post_install": PostInstallCommand},
+      cmdclass={"install": InstallCommand},
 
       test_suite="tests.test_all",
 
