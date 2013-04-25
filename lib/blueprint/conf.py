@@ -37,12 +37,16 @@ def __init(config, envmap):
     """
     Initialize the plow configuration.
     """
-    search_path = os.environ.get("BLUEPRINT_CFG", ":".join((
-        os.path.join(os.environ.get("BLUEPRINT_ROOT", "/usr/local"), "/etc/blueprint/blueprint.cfg"),
-        os.path.expanduser("~/.blueprint/blueprint.cfg"))))
+    search_path = []
+    override = os.environ.get("BLUEPRINT_CFG")
+    if override:
+        search_path.append(override)
+    else:
+        search_path.append(os.path.expanduser("~/.blueprint/blueprint.cfg"))
+        search_path.append("%s/etc/blueprint/blueprint.cfg" % os.environ.get("BLUEPRINT_ROOT", "/usr/local"))
 
     try:
-        for path in search_path.split(":"):
+        for path in search_path:
             logger.debug("Checking %s for a blueprint configuration." % path)
             if os.path.isfile(path):
                 data = open(path).read()
