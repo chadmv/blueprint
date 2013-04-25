@@ -74,10 +74,10 @@ def get(key, default=Default, **kwargs):
     If an environment variable named with key.upper().replace(".","_")
     exists, that value is returned instead.
 
-    For example, a key of "blueprint.project" would 
-    translate to the BLUEPRINT_PROJECT environment variable.
+    For example, a key of "bp.project" would 
+    translate to the BLUEPRINT_BP_PROJECT environment variable.
     """
-    env_value = os.environ.get(key.upper().replace(".", "_"))
+    env_value = os.environ.get("BLUEPRINT_" + key.upper().replace(".", "_"))
     if env_value:
         return env_value
 
