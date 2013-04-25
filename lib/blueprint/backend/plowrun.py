@@ -32,12 +32,12 @@ def serialize(runner):
     """
     job = runner.getJob()
     base_name = runner.getArg("name", job.getName())
-    job_name = conf.get("defaults", "job_name", JOB_NAME=base_name)
-    log_dir = conf.get("defaults", "log_dir", JOB_NAME=base_name)
+    job_name = conf.get("bp.job_name_template", JOB_NAME=base_name)
+    log_dir = conf.get("bp.log_dir", JOB_NAME=base_name)
     
     spec = plow.JobSpec()
     spec.project = os.environ.get("PLOW_PROJECT",
-        conf.get("defaults", "project"))
+        conf.get("bp.project"))
     spec.username = getpass.getuser()
     spec.uid = os.getuid()
     spec.paused = runner.getArg("pause")
@@ -45,7 +45,7 @@ def serialize(runner):
     spec.logPath = log_dir
     spec.layers = []
     spec.env = { 
-        "BLUEPRINT_SCRIPTS_PATH": conf.get("defaults", "scripts_path"),
+        "BLUEPRINT_SCRIPTS_PATH": conf.get("bp.scripts_dir"),
         "BLUEPRINT_ARCHIVE": job.getPath()
     }
     spec.env.update(runner.getArg("env"))
@@ -73,7 +73,7 @@ def serialize(runner):
                 task_layer.range = layer.getArg("frame_range", runner.getArg("frame_range", "1000"))
             
             task_layer.command = [
-                conf.get("defaults", "scripts_path") + "/env_wrapper.sh",
+                conf.get("bp.scripts_dir") + "/env_wrapper.sh",
                 "taskrun",
                 "-debug",
                 os.path.join(job.getPath(), "blueprint.yaml"),
@@ -94,7 +94,7 @@ def serialize(runner):
             lspec.range = layer.getArg("frame_range", 
                 runner.getArg("frame_range", "1000"))
             lspec.command = [
-                conf.get("defaults", "scripts_path") + "/env_wrapper.sh",
+                conf.get("bp.scripts_dir") + "/env_wrapper.sh",
                 "taskrun",
                 "%{RANGE}",
                 "-debug",
