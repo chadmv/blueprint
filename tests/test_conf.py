@@ -21,7 +21,7 @@ class ConfTests(unittest.TestCase):
         """
         Test getting the blueprint defaults
         """
-        cfg = blueprint.conf.get("blueprint")
+        cfg = blueprint.conf.get("bp")
         self.assertEquals("test-scene.shot-%(USER)s_%(JOB_NAME)s",
             cfg["job_name_template"])
 
@@ -30,7 +30,7 @@ class ConfTests(unittest.TestCase):
         Test automatic interpolation.
         """
         home = os.environ.get("HOME", "")
-        value = blueprint.conf.get("blueprint.output_dir")
+        value = blueprint.conf.get("bp.output_dir")
         self.assertEquals("%s/blueprint/rnd" % home, value)
 
     def testPassInterpolate(self):
@@ -38,7 +38,7 @@ class ConfTests(unittest.TestCase):
         Test passing values to interpolate
         """
         user = os.environ.get("USER", "")
-        value = blueprint.conf.get("blueprint.job_name_template", JOB_NAME="comp")
+        value = blueprint.conf.get("bp.job_name_template", JOB_NAME="comp")
         self.assertEquals("test-scene.shot-%s_%s" % (user, "comp"), value)
 
     def testInterpolateFunction(self):
@@ -67,12 +67,6 @@ class ConfTests(unittest.TestCase):
         """
         os.environ["TEST_TEST_TEST"] = "a"
         self.assertEquals("a", blueprint.conf.get("test.test.test"))
-
-
-
-
-
-
 
 if __name__ == "__main__":
     suite = unittest.TestLoader().loadTestsFromTestCase(ConfTests)
