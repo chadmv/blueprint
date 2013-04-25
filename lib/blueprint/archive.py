@@ -4,9 +4,10 @@ import os
 import uuid
 import logging
 import yaml
+import shutil
 
-import conf
-from exception import ArchiveException
+import blueprint.conf as conf
+from blueprint.exception import ArchiveException
 
 logger = logging.getLogger(__name__)
 
@@ -18,18 +19,18 @@ class Archive(object):
     """
     def __init__(self, job):
         self.__job = job
-        self.__path = "-".join(
-            (conf.get("defaults", "archive_dir", JOB_NAME=job.getName()),
-            "-%s" % uuid.uuid4()))
-        self.__make()
+        self.__path = os.path.join(
+            conf.get("bp.archive_dir", JOB_NAME=job.getName()),
+            str(uuid.uuid1()))
+        self.__create()
 
-    def __make(self):
+    def __create(self):
         logger.debug("Using archive path: %s" % self.__path)
         os.makedirs(self.__path, 0777)
         os.mkdir(os.path.join(self.__path, "layers"), 0777)
 
     def putData(self, name, data, layer=None):
-        """Puts data into the archive."""
+        """Put data into the job archive."""
         path = os.path.join(self.getPath(layer), name)
         logger.debug("Witing out data %s to path %s" % (name, path))
         fp = open(path, "w")
@@ -39,13 +40,29 @@ class Archive(object):
             fp.close()
 
     def getData(self, name):
-        pass
+        """
+        Get data from the archive or throw an ArchiveException
+        if data by the given name does not exist.
+        """
+        try:
+            stream = open(os.path.join(self.getPath(), name))
+            return yaml.load(stream)
+        except Exception, e:
+            raise ArchiveException(e)
 
     def putFile(self, name, path):
-        pass
+        """ Copy a file into the job archive."""
+        if name == "layers":
+            raise ArchiveException("layers is a reserved archive name.")
+        dst = os.path.join(self.getPath(), name)
+        shutil.copyfile(path, dst)
+        return dst
 
     def getFile(self, name):
-        pass
+        """
+        Return the name of a file in the job archive.
+        """
+        return os.path.join(self.getPath(), name)
 
     def getPath(self, layer=None):
         if layer:
@@ -64,3 +81,7 @@ class Archive(object):
                 raise ArchiveException("Failed to make archive dir: " + e)
 
         return path
+
+    def __str__(self):
+        return self.__path
+
