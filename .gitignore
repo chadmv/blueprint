@@ -3,3 +3,4 @@ Blueprint.egg-info
 build
 lib/Distutils.egg-info
 dist
+lib/plow_blueprint.egg-info
