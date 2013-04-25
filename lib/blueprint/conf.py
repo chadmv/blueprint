@@ -43,7 +43,6 @@ def __init(config, envmap):
 
     try:
         for path in search_path.split(":"):
-            print path
             logger.debug("Checking %s for a blueprint configuration." % path)
             if os.path.isfile(path):
                 data = open(path).read()
