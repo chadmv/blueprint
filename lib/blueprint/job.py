@@ -2,9 +2,9 @@
 The job class.
 """
 import uuid
+import os
 
 import blueprint.conf as conf
-
 from blueprint.archive import Archive
 from blueprint.exception import LayerException
 
@@ -52,8 +52,16 @@ class Job(object):
     def getArchive(self):
         return self.__archive
 
+    def getLogDir(self):
+        return os.path.join(
+            conf.get("bp.log_dir", JOB_NAME=self.__name),
+            self.__id)
+
     def putData(self, key, value):
         return self.__archive.putData(key, value)
+
+    def getData(self, key):
+        return self.__archive.getData(key)
 
     def setup(self):
 
