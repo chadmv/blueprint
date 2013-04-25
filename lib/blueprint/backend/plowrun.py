@@ -76,10 +76,10 @@ def serialize(runner):
                 conf.get("defaults", "scripts_path") + "/env_wrapper.sh",
                 "taskrun",
                 "-debug",
+                "-task",
+                "%{TASK}",
                 os.path.join(job.getPath(), "blueprint.yaml"),
                 "%{RANGE}",
-                "-task",
-                "%{TASK}"
             ]
 
             task = plow.TaskSpec()
@@ -96,11 +96,11 @@ def serialize(runner):
             lspec.command = [
                 conf.get("defaults", "scripts_path") + "/env_wrapper.sh",
                 "taskrun",
-                "%{RANGE}",
                 "-debug",
-                os.path.join(job.getPath(), "blueprint.yaml"),
                 "-layer",
-                layer.getName()
+                layer.getName(),
+                os.path.join(job.getPath(), "blueprint.yaml"),
+                "%{RANGE}",
             ]
             spec.layers.append(lspec)
 
