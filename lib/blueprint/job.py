@@ -1,13 +1,20 @@
+"""
+The job class.
+"""
+import uuid
 
-from archive import Archive
-from exception import LayerException
+import blueprint.conf as conf
+
+from blueprint.archive import Archive
+from blueprint.exception import LayerException
 
 class Job(object):
 
     Current = None
 
     def __init__(self, name):
-        self.__name = name
+        self.__name = conf.get("bp.job_name_template", JOB_NAME=name)
+        self.__id = str(uuid.uuid1())
         self.__layers = [ [], {} ]
         self.__archive = None
         self.__path = None
@@ -17,6 +24,9 @@ class Job(object):
 
     def getName(self):
         return self.__name
+
+    def getId(self):
+        return self.__id
 
     def getLayer(self, name):
         try:

@@ -1,7 +1,6 @@
 """The archive provides a mechanism for storing job runtime data."""
 
 import os
-import uuid
 import logging
 import yaml
 import shutil
@@ -21,7 +20,7 @@ class Archive(object):
         self.__job = job
         self.__path = os.path.join(
             conf.get("bp.archive_dir", JOB_NAME=job.getName()),
-            str(uuid.uuid1()))
+            job.getId())
         self.__create()
 
     def __create(self):
