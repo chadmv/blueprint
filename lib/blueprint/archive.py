@@ -25,6 +25,8 @@ class Archive(object):
 
     def __create(self):
         logger.debug("Using archive path: %s" % self.__path)
+        if os.path.exists(self.__path):
+            return
         os.makedirs(self.__path, 0777)
         os.mkdir(os.path.join(self.__path, "layers"), 0777)
 
