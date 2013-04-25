@@ -3,6 +3,7 @@ import os
 import argparse
 import logging
 import yaml
+import pprint 
 
 import conf
 
@@ -171,7 +172,7 @@ class BlueprintRunner(object):
 
         backend_module = self.getArg("backend")
         if not backend_module:
-            raise BlueprintException("No backend moudle is set, see defaults.backend setting in config.")
+            raise BlueprintException("No backend module is set, see defaults.backend setting in config.")
         
         logging.debug("Launching job with backend: %s" % backend_module)
         backend = loadBackendPlugin(backend_module)
