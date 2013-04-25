@@ -6,7 +6,7 @@ import logging
 
 from blueprint.layer import Layer, SetupTask
 
-logger = logging.getLogger(__file__)
+logger = logging.getLogger(__name__)
 
 class BlenderSetup(SetupTask):
     """
