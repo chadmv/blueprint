@@ -9,6 +9,10 @@ from blueprint.exception import CommandException
 logger = logging.getLogger(__name__)
 
 def getOutputSeq(scene_file, format):
+    """
+    A utility function for converting a scene file name into an output
+    sequence name.
+    """
     basename = os.path.splitext(os.path.basename(scene_file))[0]
     return os.path.join(
         conf.get("bp.output_dir"),
@@ -16,6 +20,10 @@ def getOutputSeq(scene_file, format):
         "%s.#.%s" % (basename, format))
 
 def system(cmd, frames=None):
+    """
+    Utility method for shelling out.  Takes a shell
+    command in the form of an array.
+    """
     cmd = map(str, cmd)
     cmdStr = " ".join(cmd)
     logger.info("About to run: %s", cmdStr)
