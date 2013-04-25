@@ -77,12 +77,10 @@ class PluginManager(object):
     @classmethod
     def getActivePlugins(cls):
         result = []
-        for section in conf.Parser.sections():
-            if not section.startswith("plugin:"):
+        for plugin in conf.get("plugins"):
+            if not plugin["enabled"]:
                 continue
-            if not conf.asBool(conf.get(section, "enabled")):
-                continue
-            result.append(conf.get(section, "module"))
+            result.append(plugin["module"])
         return result
 
     @classmethod
@@ -143,7 +141,7 @@ class BlueprintRunner(object):
         self.__defaults = {
             "host": None, 
             "pause": False,
-            "backend": conf.get("defaults", "backend"),
+            "backend": conf.get("bp.backend", default="plow"),
             "name": "",
             "pretend": False,
             "script": None,
