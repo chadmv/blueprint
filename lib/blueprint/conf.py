@@ -1,39 +1,97 @@
+"""
+Blueprint configuration module.
+
+Provides a get() function to access the blueprint configuration with a
+dot notation style.
+
+Example:
+
+maya_renderer = conf.get("modules.maya.renderer")
+
+"""
 import os
-import ConfigParser
+import simplejson
+import logging
 
-__all__ = ["Parser"]
+import blueprint.exception
 
-Parser = ConfigParser.RawConfigParser()
+logger = logging.getLogger(__name__)
 
-def _init():
-    """
-    Parse an initalize the Config object
-    """
-    if os.environ.get("BLUEPRINT_CFG"):
-        cfgs = Parser.read([os.environ["BLUEPRINT_CFG"]])
-    else:
-        cfgs = Parser.read([
-            os.path.join(os.environ.get("BLUEPRINT_ROOT", "/usr/local"), "etc/blueprint/blueprint.cfg"),
-            os.path.expanduser("~/.blueprint/blueprint.cfg")])
-    assert(cfgs)
+class _Default(object):
+    def __init__(self):
+        pass
 
-# run as a function to avoid polluting module with temp variables
-_init()
+class _Raise(object):
+    def __init__(self):
+        pass
 
-_BOOLEANS = frozenset(["true", "1", "on", "yes"])
-def asBool(value):
-    """
-    Convert a string value into a boolean.
-    """
-    return value.lower() in _BOOLEANS
+__Config = { }
 
-def get(section, key, **kwargs):
+__EnvMap = { }
+
+Default = _Default()
+
+Raise = _Raise()
+
+def __init(config, envmap):
     """
-    Return the specified configuration option.  Automatically
-    interpolates any environement variables specified in plow.ini.
+    Initialize the plow configuration.
     """
-    interps = Parser.get("env", "interpolate").split(",")
-    args = dict([(inter, os.environ.get(inter, "test")) for inter in interps])
-    if kwargs:
-        args.update(kwargs)
-    return Parser.get(section, key) % args
+    search_path = os.environ.get("BLUEPRINT_CFG", ":".join((
+        os.path.join(os.environ.get("BLUEPRINT_ROOT", "/usr/local"), "/etc/blueprint/blueprint.cfg"),
+        os.path.expanduser("~/.blueprint/blueprint.cfg"))))
+
+    try:
+        for path in search_path.split(":"):
+            print path
+            logger.debug("Checking %s for a blueprint configuration." % path)
+            if os.path.isfile(path):
+                data = open(path).read()
+                config.update(simplejson.loads(data))
+                envmap.update(dict(((k, os.environ.get(k, "")) 
+                    for k in config["env"]["interpolate"])))
+                return
+    except Exception, e:
+        raise blueprint.exception.BlueprintException(
+            "Failed to parse plow configuration: %s" % e)
+
+    raise blueprint.exception.BlueprintException(
+        "Unable to find plow configuration at: %s" % search_path)
+
+def interp(value, **kwargs):
+    kwargs.update(__EnvMap)
+    return value % kwargs
+
+def get(key, default=Default, **kwargs):
+    """
+    Return the specification configuration value.  If the
+    value is undefined, return the default.  If the default is
+    conf.Raise, then a BlueprintException is thrown.
+
+    If an environment variable named with key.upper().replace(".","_")
+    exists, that value is returned instead.
+
+    For example, a key of "blueprint.project" would 
+    translate to the BLUEPRINT_PROJECT environment variable.
+    """
+    env_value = os.environ.get(key.upper().replace(".", "_"))
+    if env_value:
+        return env_value
+
+    elements = key.split(".")
+    part = __Config
+    try:
+        for e in elements:
+            part = part[e]
+    except KeyError:
+        if default == Raise:
+            raise blueprint.exception.BlueprintException(
+                "Invalid configuration option: %s" % key)
+        return default
+
+    if isinstance(part, basestring):
+        part = interp(part, **kwargs)
+    return part
+
+# Initialize the configuration.
+__init(__Config, __EnvMap)
