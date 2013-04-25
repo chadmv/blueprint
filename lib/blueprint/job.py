@@ -13,7 +13,7 @@ class Job(object):
     Current = None
 
     def __init__(self, name):
-        self.__name = conf.get("bp.job_name_template", JOB_NAME=name)
+        self.setName(name)
         self.__id = str(uuid.uuid1())
         self.__layers = [ [], {} ]
         self.__archive = None
@@ -24,6 +24,9 @@ class Job(object):
 
     def getName(self):
         return self.__name
+
+    def setName(self, name):
+        self.__name = conf.get("bp.job_name_template", JOB_NAME=name)
 
     def getId(self):
         return self.__id

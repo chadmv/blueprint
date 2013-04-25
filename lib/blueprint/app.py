@@ -190,6 +190,7 @@ class BlueprintRunner(object):
     def getJob(self):
         if not self.__job:
             self.__job = loadScript(self.getArg("script"))
+            self.__job.setName(self.getArg("name"))
         return self.__job
 
 
