@@ -13,7 +13,6 @@ class ArchiveTests(unittest.TestCase):
         self.job.setup()
 
     def testArchivePath(self):
-        self.job.setup()
         p = self.job.getArchive()
         self.assertTrue(self.job.getName() in p.getPath())
         self.assertTrue(os.path.isdir(p.getPath()))

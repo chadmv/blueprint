@@ -8,6 +8,7 @@ import sys
 import logging
 logging.basicConfig(level=logging.INFO)
 
+import setup
 
 TEST_DIR = os.path.abspath(os.path.dirname(__file__))
 SRC_DIR = os.path.join(TEST_DIR, "../lib")
