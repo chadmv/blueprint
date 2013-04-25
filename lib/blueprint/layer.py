@@ -4,8 +4,9 @@ import tempfile
 
 from collections import namedtuple
 
+import conf
 from job import Job
-from io import Io, system
+from io import FileIO, system
 from app import PluginManager
 
 logger = logging.getLogger(__name__)
@@ -52,6 +53,7 @@ class Layer(object):
         self.__inputs = {}
 
         self.__handleDependArg()
+        self.__loadDefaultArgs()
 
     def getName(self):
         return self.__name
@@ -102,10 +104,11 @@ class Layer(object):
         return self.__inputs.values()
 
     def addInput(self, name, path, attrs=None):
-        self.__inputs[name] = Io(name, path, attrs)
+        self.__inputs[name] = FileIO(path, attrs)
+        self.putData("inputs", self.__inputs)
 
     def addOutput(self, name, path, attrs=None):
-        self.__outputs[name] = Io(name, path, attrs)
+        self.__outputs[name] = FileIO(path, attrs)
         self.putData("outputs", self.__outputs)
 
     def getSetupTasks(self):
@@ -148,6 +151,10 @@ class Layer(object):
         system(cmd)
 
     def _afterInit(self):
+        """
+        _afterInit is called once all the layer args
+        have their final values.
+        """
         pass
 
     def _setup(self):
@@ -161,6 +168,21 @@ class Layer(object):
 
     def _afterExecute(self):
         pass
+
+    def __loadDefaultArgs(self):
+        """
+        Load in default args for this module from the configuration file
+        and populate the __defaults.
+        """
+        mod = self.__class__.__name__.lower()
+        logger.debug("Loading default args for module: %s" % mod)
+
+        default_args = conf.get("modules.%s" % mod, None)
+        if not default_args:
+            return
+        for k, v in default_args.iteritems():
+            logger.debug("Setting default %s arg: %s=%s" % (mod, k, v))
+            self.setArg(k, v)
     
     def __handleDependArg(self):
         """
