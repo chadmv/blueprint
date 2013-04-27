@@ -190,7 +190,8 @@ class BlueprintRunner(object):
     def getJob(self):
         if not self.__job:
             self.__job = loadScript(self.getArg("script"))
-            self.__job.setName(self.getArg("name"))
+            if self.getArg("name", None):
+                self.__job.setName(self.getArg("name"))
         return self.__job
 
 
@@ -201,7 +202,6 @@ def loadBackendPlugin(name):
 def loadScript(path):
 
     from blueprint.job import Job
-
     if os.path.basename(path) == "blueprint.yaml":
         Job.Current = yaml.load(file(path, 'r'))
         # Yamlized jobs have no session but they
@@ -210,7 +210,7 @@ def loadScript(path):
         if Job.Current.getPath():
             Job.Current.loadArchive()
     else:
-        Job.Current = Job(os.path.basename(path).split(".")[0])
+        Job.Current = Job(os.path.basename(path.split(".")[0]))
         execfile(path, {})
 
     return Job.Current
