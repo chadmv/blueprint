@@ -10,7 +10,7 @@ maya_renderer = conf.get("modules.maya.renderer")
 
 """
 import os
-import simplejson
+import json
 import logging
 
 import blueprint.exception
@@ -50,7 +50,7 @@ def __init(config, envmap):
             logger.debug("Checking %s for a blueprint configuration." % path)
             if os.path.isfile(path):
                 data = open(path).read()
-                config.update(simplejson.loads(data))
+                config.update(json.loads(data))
                 envmap.update(dict(((k, os.environ.get(k, "")) 
                     for k in config["env"]["interpolate"])))
                 return
