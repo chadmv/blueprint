@@ -18,12 +18,10 @@ def launch(runner, spec):
 def createLayerSpec(layer):
     lspec = plow.LayerSpec()
     lspec.name = layer.getName()
-    lspec.tags =  set(layer.getArg("tags", ["unassigned"]))
+    lspec.tags =  layer.getArg("tags", ["unassigned"])
     lspec.chunk = layer.getArg("chunk", 1)
-    lspec.minCores = layer.getArg("threads", 1)
-    lspec.maxCores = layer.getArg("max_threads", 0)
-    lspec.minRamMb = layer.getArg("ram", 512)
-
+    lspec.service = layer.getArg("service", "default")
+    
     return lspec
 
 def serialize(runner):
@@ -68,7 +66,6 @@ def serialize(runner):
                 task_layer.tags.update(layer.getArg("tags", set()))
                 # Use the highest values on any task.
                 task_layer.minCores = max(task_layer.minCores, task.getArg("threads", 1))
-                task_layer.maxCores = max(task_layer.maxCores, task.getArg("max_threads", 0))
                 task_layer.minRamMb = max(task_layer.minRamMb, task.getArg("ram"))
                 task_layer.range = layer.getArg("frame_range", runner.getArg("frame_range", "1000"))
             

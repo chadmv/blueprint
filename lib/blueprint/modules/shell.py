@@ -14,6 +14,7 @@ class Shell(Layer):
         """
         Layer.__init__(self, name, **args)
         self.requireArg("cmd", (list, tuple))
+        self.setArg("service", "shell")
 
     def _execute(self, frames):
         for frame in frames:
@@ -28,6 +29,7 @@ class ShellCommand(Task):
         """
         Task.__init__(self, name, **args)
         self.requireArg("cmd", (list, tuple))
+        self.setArg("service", "shell")
 
     def _execute(self):
         system(self.getArg("cmd"))
