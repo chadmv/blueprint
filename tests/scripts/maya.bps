@@ -1,0 +1,5 @@
+
+from blueprint.modules.maya import Maya
+
+Maya("sphere", scene="/Users/matt/Documents/maya/projects/default/scenes/sphere_v1.mb")
+
