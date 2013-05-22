@@ -36,6 +36,6 @@ def afterExecute(layer):
     logger.info("afterExecute %s plugin." %  __name__)
     Init.AfterExecute = True
 
-def preLaunch(spec):
+def preLaunch(spec, job):
     logger.info("PreLaunch %s plugin." %  __name__)
     Init.PreLaunch = True
