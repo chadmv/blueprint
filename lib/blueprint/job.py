@@ -3,6 +3,7 @@ The job class.
 """
 import uuid
 import os
+import fileseq
 
 import blueprint.conf as conf
 from blueprint.archive import Archive
@@ -12,12 +13,13 @@ class Job(object):
 
     Current = None
 
-    def __init__(self, name):
+    def __init__(self, name, frange="1001-1001"):
         self.setName(name)
         self.__id = str(uuid.uuid1())
         self.__layers = [ [], {} ]
         self.__archive = None
         self.__path = None
+        self.__range = frange
 
     def getPath(self):
         return self.__path
@@ -80,4 +82,16 @@ class Job(object):
             archive.putData("blueprint.yaml", self)
         finally:
             self.__archive = archive
+
+    def getFrameRange(self):
+        """Return the string frame range for this job."""
+        return self.__range
+
+    def getFrameSet(self):
+        """Return a FrameSet for the job's frame range."""
+        return fileseq.FrameSet(self.__range)
+
+    def setFrameRange(self, frange):
+        """Set the job's frame range."""
+        self.__range = frange
 
