@@ -97,6 +97,17 @@ class LayerTests(unittest.TestCase):
         l.afterExecute()
         self.assertTrue(l.afterExecuteSet)
 
+    def testSetFrameRange(self):
+        """Test setting the frame range attr."""
+        self.job.addLayer(self.layer)
+        self.assertEquals("1001-1001", self.layer.getFrameRange())
+        self.assertEquals(1001, self.layer.getFrameSet()[0])
+        self.assertEquals(1001, self.layer.getFrameSet()[-1])
+        self.layer.setFrameRange("1-10")
+        self.assertEquals("1-10", self.layer.getFrameRange())
+        self.assertEquals(1, self.layer.getFrameSet()[0])
+        self.assertEquals(10, self.layer.getFrameSet()[-1])
+
 class TaskTests(unittest.TestCase):
 
     def testCreateTask(self):

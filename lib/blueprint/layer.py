@@ -52,7 +52,8 @@ class Layer(object):
         self.__setups = []
         self.__outputs = {}
         self.__inputs = {}
-
+        self.__range = args.get("range")
+        
         self.__handleDependArg()
         self.__loadDefaultArgs()
 
@@ -163,6 +164,24 @@ class Layer(object):
 
     def system(self, cmd):
         system(cmd)
+
+    def getFrameRange(self):
+        frange = self.getArg("range", None)
+        if not frange:
+            return self.getJob().getFrameRange()
+        return frange
+
+    def getFrameRange(self):
+        if self.__range:
+            return self.__range
+        else:
+            return self.getJob().getFrameRange()
+
+    def getFrameSet(self):
+        return fileseq.FrameSet(self.getFrameRange())
+
+    def setFrameRange(self, frange):
+        self.__range = frange
 
     def _afterInit(self):
         """
