@@ -137,7 +137,7 @@ LoadDefault = object()
 
 class BlueprintRunner(object):
 
-    def __init__(self, **kwargs):
+    def __init__(self, job=None, **kwargs):
         self.__args = {}
         self.__defaults = {
             "host": None, 
@@ -150,7 +150,7 @@ class BlueprintRunner(object):
             "env": { }
         }
         self.__args.update(kwargs)
-        self.__job = None
+        self.__job = job
 
     def setArg(self, key, value):
         self.__args[key] = value
@@ -182,18 +182,22 @@ class BlueprintRunner(object):
         if self.getArg("pretend"):
             pprint.pprint(spec)
         else:
-            backend.launch(self, spec)
+            return backend.launch(self, spec)
 
     def setup(self):
-        return self.getJob().setup()
+        job = self.getJob()
+        job.setup()
 
     def getJob(self):
         if not self.__job:
+            if not self.getArg("script"):
+                raise BlueprintException("A blueprint runner must be provided with a job or script object to run.")
             self.__job = loadScript(self.getArg("script"))
+            if self.getArg("range"):
+                self.__job.setFrameRange(self.getArg("range"))
             if self.getArg("name", None):
                 self.__job.setName(self.getArg("name"))
         return self.__job
-
 
 def loadBackendPlugin(name):
     logger.debug("loading queue backend: %s" % name)
