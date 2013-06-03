@@ -41,7 +41,7 @@ class InstallCommand(_install):
 # Setup
 #
 setup(name='plow-blueprint',
-      version='0.1.1',
+      version='0.1.2',
 
       package_dir = {'': 'lib', 'tests':'tests'},
       packages=find_packages('lib') + find_packages(),
