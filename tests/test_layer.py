@@ -1,9 +1,10 @@
-
+#!/usr/bin/env python
 import os
 import json
 import unittest
 import logging
 
+import setup
 import blueprint
 
 from common import TestLayer, TestTask
@@ -68,9 +69,11 @@ class LayerTests(unittest.TestCase):
 
     def testSetup(self):
         """Test that _setup is being called."""
+        # To call setup you must have a job
         l = TestLayer("test2")
+        self.job.addLayer(l)
         self.assertFalse(l.setupSet)
-        l.setup()
+        self.job.setup()
         self.assertTrue(l.setupSet)
 
     def testExecute(self):
@@ -93,7 +96,6 @@ class LayerTests(unittest.TestCase):
         self.assertFalse(l.afterExecuteSet)
         l.afterExecute()
         self.assertTrue(l.afterExecuteSet)
-
 
 class TaskTests(unittest.TestCase):
 

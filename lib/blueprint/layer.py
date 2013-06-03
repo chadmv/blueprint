@@ -1,6 +1,7 @@
 import os
 import logging
 import tempfile
+import fileseq
 
 from collections import namedtuple
 
@@ -83,6 +84,10 @@ class Layer(object):
         return self.__job
 
     def putData(self, name, data):
+        if not self.__job:
+            raise BlueprintException("The layer %s requires a job to before setup() is run" % self.__name)
+        if not self.__job.getArchive():
+            raise BlueprintException("A job archive must exist before dynamic data can be added.")
         self.__job.getArchive().putData(name, data, self)
 
     def getData(self, name):
@@ -105,11 +110,17 @@ class Layer(object):
 
     def addInput(self, name, path, attrs=None):
         self.__inputs[name] = FileIO(path, attrs)
-        self.putData("inputs", self.__inputs)
+        # If the job doesn't have an archive yet
+        # add these at setup time.
+        if self.__job and self.__job.getArchive():
+            self.putData("inputs", self.__inputs)
 
     def addOutput(self, name, path, attrs=None):
         self.__outputs[name] = FileIO(path, attrs)
-        self.putData("outputs", self.__outputs)
+        # If the job doesn't have an archive yet
+        # add these at setup time.
+        if self.__job and self.__job.getArchive():
+            self.putData("outputs", self.__outputs)
 
     def getSetupTasks(self):
         return list(self.__setups)
@@ -125,6 +136,9 @@ class Layer(object):
         PluginManager.runAfterInit(self)
 
     def setup(self):
+        # If any inputs or outputs are set add them to the archive
+        self.putData("inputs", self.__inputs)
+        self.putData("outputs", self.__outputs)
         self._setup()
         PluginManager.runSetup(self)
 
