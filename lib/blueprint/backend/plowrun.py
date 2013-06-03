@@ -58,11 +58,10 @@ def serialize(runner):
             if not task_layers.has_key(layer.getArg("layer")):
                 task_layer = createLayerSpec(layer)
                 task_layer.name = layer.getArg("layer", "default")
-                task_layer.service = task_layer.name
-                task_layer.range = job.getFrameSet()[0]
                 task_layer.tasks = []
+                spec.layers.append(task_layer)
             else:
-                task_layer = task_layers[layer.getGroup()]
+                task_layer = task_layers[layer.getArg("layer")]
 
             task_layer.command = [
                 conf.get("bp.scripts_dir") + "/env_wrapper.sh",
@@ -78,8 +77,6 @@ def serialize(runner):
             task.name = layer.getName()
             task.depends = setupTaskDepends(job, layer) 
             task_layer.tasks.append(task)
-            spec.layers.append(task_layer)
-
         else:
             lspec = createLayerSpec(layer)
             lspec.depends = setupLayerDepends(job, layer)
