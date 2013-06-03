@@ -223,13 +223,12 @@ class SetupTask(Task):
 
     def __init__(self, layer, **args):
         Task.__init__(self, "%s_setup" % layer.getName(), **args)
-        self.__layer = layer 
+        self.__parent = layer 
         layer.dependOn(self, DependType.All)
+        self.setArg("layer", "setup_tasks")
 
-        self.setArg("group", "setups")
-
-    def getLayer(self):
-        return self.__layer
+    def getParentLayer(self):
+        return self.__parent
 
 
 

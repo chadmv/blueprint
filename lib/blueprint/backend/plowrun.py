@@ -56,9 +56,9 @@ def serialize(runner):
         if isinstance(layer, (blueprint.Task,)):
             # Have to create a plow layer to store blueprint tasks.
             # This would be to org
-            if not task_layers.has_key(layer.getArg("group")):
+            if not task_layers.has_key(layer.getArg("layer")):
                 task_layer = createLayerSpec(layer)
-                task_layer.name = layer.getArg("group", "default")
+                task_layer.name = layer.getArg("layer", "default")
                 task_layer.tasks = []
             else:
                 task_layer = task_layers[layer.getGroup()]
