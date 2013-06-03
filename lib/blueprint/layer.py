@@ -53,7 +53,7 @@ class Layer(object):
         self.__outputs = {}
         self.__inputs = {}
         self.__range = args.get("range")
-        
+
         self.__handleDependArg()
         self.__loadDefaultArgs()
 
@@ -259,6 +259,7 @@ class SetupTask(Task):
         self.__parent = layer 
         layer.dependOn(self, DependType.All)
         self.setArg("layer", "setup_tasks")
+        self.setArg("service", "setup_task")
 
     def getParentLayer(self):
         return self.__parent
