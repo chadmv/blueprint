@@ -113,10 +113,6 @@ class TaskTests(unittest.TestCase):
     def testCreateTask(self):
         t = TestTask("test")
 
-
-
-
-
 if __name__ == "__main__":
     suite = unittest.TestSuite()
     for t in (LayerTests, TaskTests):
