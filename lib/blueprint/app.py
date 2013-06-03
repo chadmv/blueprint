@@ -146,7 +146,7 @@ class BlueprintRunner(object):
             "name": "",
             "pretend": False,
             "script": None,
-            "frame_range": None,
+            "range": None,
             "env": { }
         }
         self.__args.update(kwargs)

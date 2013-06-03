@@ -36,7 +36,7 @@ class Bluerun(blueprint.Application):
             self._runner.setArg("env", current_env)
 
         self._runner.setArg("script", args.script)
-        self._runner.setArg("frame_range", args.range)
+        self._runner.setArg("range", args.range)
         self._runner.launch()
 
 if __name__ == "__main__":
