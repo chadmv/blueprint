@@ -21,7 +21,6 @@ def createLayerSpec(layer):
     lspec.tags =  layer.getArg("tags", ["unassigned"])
     lspec.chunk = layer.getArg("chunk", 1)
     lspec.service = layer.getArg("service", "default")
-    
     return lspec
 
 def serialize(runner):
@@ -59,16 +58,12 @@ def serialize(runner):
             if not task_layers.has_key(layer.getArg("layer")):
                 task_layer = createLayerSpec(layer)
                 task_layer.name = layer.getArg("layer", "default")
+                task_layer.service = task_layer.name
+                task_layer.range = job.getFrameSet()[0]
                 task_layer.tasks = []
             else:
                 task_layer = task_layers[layer.getGroup()]
-                # Merge in the tags for the other layer.  Probably not the best option.
-                task_layer.tags.update(layer.getArg("tags", set()))
-                # Use the highest values on any task.
-                task_layer.minCores = max(task_layer.minCores, task.getArg("threads", 1))
-                task_layer.minRamMb = max(task_layer.minRamMb, task.getArg("ram"))
-                task_layer.range = layer.getArg("frame_range", runner.getArg("frame_range", "1000"))
-            
+
             task_layer.command = [
                 conf.get("bp.scripts_dir") + "/env_wrapper.sh",
                 "taskrun",
@@ -88,8 +83,7 @@ def serialize(runner):
         else:
             lspec = createLayerSpec(layer)
             lspec.depends = setupLayerDepends(job, layer)
-            lspec.range = layer.getArg("frame_range", 
-                runner.getArg("frame_range", "1000"))
+            lspec.range = layer.getFrameRange()
             lspec.command = [
                 conf.get("bp.scripts_dir") + "/env_wrapper.sh",
                 "taskrun",
@@ -151,8 +145,3 @@ def setupTaskDepends(job, task):
             dspec.dependOnLayer = str(depend.dependOn)
         result.append(dspec)
     return result
-
-
-
-
-
