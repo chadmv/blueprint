@@ -32,11 +32,17 @@ class PluginManager(object):
     def loadPlugin(cls, module):
         if module in cls.loaded:
             return
-        plugin = __import__(module, globals(), locals(), [module])
+        try:
+            plugin = __import__(module, globals(), locals(), [module])
+        except ImportError, e:
+            logger.warn("Failed to load plugin: %s, %s" % (module, e))
+            return
+
         try:
             plugin.init()
         except  AttributeError, e:
             pass
+        
         logger.debug("Initialized plugin %s" % plugin)
         cls.loaded.append(plugin)
 
