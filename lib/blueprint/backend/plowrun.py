@@ -71,7 +71,8 @@ def serialize(runner):
                 "taskrun",
                 "-debug",
                 "-task",
-                "%{TASK}"
+                "%{TASK}",
+                os.path.join(job.getPath(), "blueprint.yaml")
             ]
 
             task = plow.TaskSpec()
