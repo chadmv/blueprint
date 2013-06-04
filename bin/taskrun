@@ -28,7 +28,7 @@ class Taskrun(blueprint.Application):
         try:
             if args.layer:
                 layer = job.getLayer(args.layer)
-                layer.execute(args.frame)
+                layer.execute(int(args.frame))
             elif args.task:
                 task = job.getLayer(args.task)
                 task.execute()
