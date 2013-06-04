@@ -108,6 +108,20 @@ class LayerTests(unittest.TestCase):
         self.assertEquals(1, self.layer.getFrameSet()[0])
         self.assertEquals(10, self.layer.getFrameSet()[-1])
 
+    def testGetLocalFrameSetChunked(self):
+        """Test getting the local frameset."""
+        l = TestLayer("test2", chunk=10, range="1-20")
+        frameset = l.getLocalFrameSet(1)
+        self.assertEquals("1-10", str(frameset.normalize()))
+        frameset = l.getLocalFrameSet(11)
+        self.assertEquals("11-20", str(frameset.normalize()))
+
+    def testGetLocalFrameSetSingle(self):
+        """Test getting the local frameset."""
+        l = TestLayer("test2")
+        frameset = l.getLocalFrameSet(1)
+        print frameset
+
 class TaskTests(unittest.TestCase):
 
     def testCreateTask(self):

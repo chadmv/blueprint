@@ -20,7 +20,10 @@ def createLayerSpec(layer):
     lspec.name = layer.getName()
     lspec.tags =  layer.getArg("tags", ["unassigned"])
     lspec.chunk = layer.getArg("chunk", 1)
-    lspec.service = layer.getArg("service", "default")
+    if layer.getArg("service"):
+        lspec.service = layer.getArg("service")
+    if layer.getArg("memory"):
+        lspec.minRam = layer.getArg("memory")
     return lspec
 
 def serialize(runner):
@@ -68,9 +71,7 @@ def serialize(runner):
                 "taskrun",
                 "-debug",
                 "-task",
-                "%{TASK}",
-                os.path.join(job.getPath(), "blueprint.yaml"),
-                "%{RANGE}",
+                "%{TASK}"
             ]
 
             task = plow.TaskSpec()
@@ -88,7 +89,8 @@ def serialize(runner):
                 "-layer",
                 layer.getName(),
                 os.path.join(job.getPath(), "blueprint.yaml"),
-                "%{RANGE}",
+                "-frame",
+                "%{FRAME}"
             ]
             spec.layers.append(lspec)
 

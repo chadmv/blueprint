@@ -9,6 +9,7 @@ import conf
 from job import Job
 from io import FileIO, system
 from app import PluginManager
+from exception import LayerException
 
 logger = logging.getLogger(__name__)
 
@@ -53,6 +54,7 @@ class Layer(object):
         self.__outputs = {}
         self.__inputs = {}
         self.__range = args.get("range")
+        self.__chunk = args.get("chunk", 1)
 
         self.__handleDependArg()
         self.__loadDefaultArgs()
@@ -147,9 +149,16 @@ class Layer(object):
         self._beforeExecute()
         PluginManager.runBeforeExecute(self)
 
-    def execute(self, *args):
+    def execute(self, frame=None):
+
         self.beforeExecute()
-        self._execute(*args)
+
+        if frame:
+            frameset = self.getLocalFrameSet(frame)
+            self._execute(frameset)
+        else:
+            self._execute()
+
         self.afterExecute()
 
     def afterExecute(self):
@@ -182,6 +191,37 @@ class Layer(object):
 
     def setFrameRange(self, frange):
         self.__range = frange
+
+    def getLocalFrameSet(self, frame):
+        """
+        Return the local frameset when running in execute mode.
+        """
+        frameset = None
+        
+        if self.getChunk() <= 0:
+            framset = self.getFrameSet()
+        elif self.getChunk() >1:
+            result = []
+
+            full_range = self.getFrameSet()
+            end = len(full_range) - 1
+
+            idx = full_range.index(frame)
+            for i in range(idx, idx+self.getChunk()):
+                if i > end:
+                    break
+                result.append(full_range[i])
+            frameset = fileseq.FrameSet(",".join(map(str, result)))
+        else:
+            frameset = fileseq.FrameSet(str(frame))
+
+        if frameset is None:
+            raise LayerException("Unable to determine local frameset.")
+
+        return frameset
+
+    def getChunk(self):
+        return self.__chunk
 
     def _afterInit(self):
         """
