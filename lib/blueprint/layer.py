@@ -154,6 +154,7 @@ class Layer(object):
         self.beforeExecute()
 
         if frame:
+            logger.info("Executing frame %d in layer %s" % (frame, self.getName()))
             frameset = self.getLocalFrameSet(frame)
             self._execute(frameset)
         else:
