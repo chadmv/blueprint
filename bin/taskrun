@@ -14,7 +14,7 @@ class Taskrun(blueprint.Application):
         group = self._argparser.add_argument_group("Taskrun Options")
         
         group.add_argument("script", metavar="SCRIPT", help="Path to blueprint script.")
-        group.add_argument("-frame", metavar="FRAME", help="Frame", default="1001")
+        group.add_argument("-frame", metavar="FRAME", help="The frame number to execute.", default="1001")
 
         group.add_argument("-layer", metavar="LAYER", 
             help="Layer to execute task from.")
