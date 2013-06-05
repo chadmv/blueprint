@@ -297,7 +297,8 @@ class SetupTask(Task):
 
     def __init__(self, layer, **args):
         Task.__init__(self, "%s_setup" % layer.getName(), **args)
-        self.__parent = layer 
+        self.__parent = layer
+        self.__parent.getJob().addLayer(self)
         layer.dependOn(self, DependType.All)
         self.setArg("layer", "setup_tasks")
         self.setArg("service", "setup_task")
