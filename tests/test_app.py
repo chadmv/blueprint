@@ -21,8 +21,10 @@ class PluginManagerTests(unittest.TestCase):
 
     def testSetup(self):
         """Test that setup is being run by the plugin manager."""
+        j = blueprint.Job("foo")
         l = TestLayer("test2")
-        l.setup()
+        j.addLayer(l)
+        j.setup()
         self.assertTrue(blueprint.plugins.test_plugin.Init.Setup)
 
     def testBeforeExecute(self):

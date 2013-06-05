@@ -88,9 +88,9 @@ class Layer(object):
 
     def putData(self, name, data):
         if not self.__job:
-            raise BlueprintException("The layer %s requires a job to before setup() is run" % self.__name)
+            raise LayerException("The layer %s requires a job to be set setup() is run." % self.__name)
         if not self.__job.getArchive():
-            raise BlueprintException("A job archive must exist before dynamic data can be added.")
+            raise LayerException("A job archive must exist before dynamic data can be added.")
         self.__job.getArchive().putData(name, data, self)
 
     def getData(self, name):

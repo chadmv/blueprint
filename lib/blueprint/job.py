@@ -40,8 +40,6 @@ class Job(object):
             raise LayerException("Layer %s does not exist." % name)
 
     def addLayer(self, layer):
-        print "adding layer %s" % layer.__repr__()
-        print layer in self.__layers[0]
         if layer in self.__layers[0]:
             logger.debug("The layer %s is already in the job." % layer.getName())
             return
