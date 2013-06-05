@@ -198,9 +198,9 @@ class Layer(object):
         Return the local frameset when running in execute mode.
         """
         frameset = None
-        
+
         if self.getChunk() <= 0:
-            framset = self.getFrameSet()
+            frameset = self.getFrameSet()
         elif self.getChunk() >1:
             result = []
 
