@@ -20,6 +20,9 @@ def createLayerSpec(layer):
     lspec.name = layer.getName()
     lspec.tags =  layer.getArg("tags", ["unassigned"])
     lspec.chunk = layer.getChunk()
+
+    if layer.getArg("maxRetries"):
+        lspec.maxRetries = layer.getArg("maxRetries")
     if layer.getArg("service"):
         lspec.service = layer.getArg("service")
     if layer.getArg("memory"):
@@ -80,6 +83,10 @@ def serialize(runner):
             task.depends = setupTaskDepends(job, layer) 
             task_layer.tasks.append(task)
         else:
+
+
+
+
             lspec = createLayerSpec(layer)
             lspec.depends = setupLayerDepends(job, layer)
             lspec.range = layer.getFrameRange()
