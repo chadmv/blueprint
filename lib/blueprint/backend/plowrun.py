@@ -61,32 +61,29 @@ def serialize(runner):
         if isinstance(layer, (blueprint.Task,)):
             # Have to create a plow layer to store blueprint tasks.
             # This would be to org
-            if not task_layers.has_key(layer.getArg("layer")):
+            layer_name = layer.getArg("layer", "default")
+            if not task_layers.has_key(layer_name):
                 task_layer = createLayerSpec(layer)
                 task_layer.name = layer.getArg("layer", "default")
+                task_layer.command = [
+                    conf.get("bp.scripts_dir") + "/env_wrapper.sh",
+                    "taskrun",
+                    "-debug",
+                    "-task",
+                    "%{TASK}",
+                    os.path.join(job.getPath(), "blueprint.yaml")
+                ]
                 task_layer.tasks = []
                 spec.layers.append(task_layer)
+                task_layers[layer_name] = task_layer
             else:
-                task_layer = task_layers[layer.getArg("layer")]
-
-            task_layer.command = [
-                conf.get("bp.scripts_dir") + "/env_wrapper.sh",
-                "taskrun",
-                "-debug",
-                "-task",
-                "%{TASK}",
-                os.path.join(job.getPath(), "blueprint.yaml")
-            ]
+                task_layer = task_layers[layer_name]
 
             task = plow.TaskSpec()
             task.name = layer.getName()
             task.depends = setupTaskDepends(job, layer) 
             task_layer.tasks.append(task)
         else:
-
-
-
-
             lspec = createLayerSpec(layer)
             lspec.depends = setupLayerDepends(job, layer)
             lspec.range = layer.getFrameRange()
