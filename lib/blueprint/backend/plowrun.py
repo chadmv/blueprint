@@ -19,7 +19,7 @@ def createLayerSpec(layer):
     lspec = plow.LayerSpec()
     lspec.name = layer.getName()
     lspec.tags =  layer.getArg("tags", ["unassigned"])
-    lspec.chunk = layer.getArg("chunk", 1)
+    lspec.chunk = layer.getChunk()
     if layer.getArg("service"):
         lspec.service = layer.getArg("service")
     if layer.getArg("memory"):
