@@ -295,6 +295,7 @@ class Task(Layer):
     """
     def __init__(self, name, **args):
         Layer.__init__(self, name, **args)
+        self.setArg("layer", "default")
    
 class SetupTask(Task):
 
