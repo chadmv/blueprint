@@ -224,6 +224,9 @@ class Layer(object):
     def getChunk(self):
         return self.__chunk
 
+    def setChunk(self, size):
+        self.__chunk = size
+
     def _afterInit(self):
         """
         _afterInit is called once all the layer args
