@@ -240,7 +240,7 @@ class Layer(object):
     def _beforeExecute(self):
         pass
 
-    def _execute(self):
+    def _execute(self, *args):
         pass
 
     def _afterExecute(self):
