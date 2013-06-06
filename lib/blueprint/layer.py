@@ -296,7 +296,10 @@ class Task(Layer):
     def __init__(self, name, **args):
         Layer.__init__(self, name, **args)
         self.setArg("layer", "default")
-   
+
+    def _execute(self):
+        pass
+
 class SetupTask(Task):
 
     def __init__(self, layer, **args):
