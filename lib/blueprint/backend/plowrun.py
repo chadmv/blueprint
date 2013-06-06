@@ -64,7 +64,7 @@ def serialize(runner):
             layer_name = layer.getArg("layer", "default")
             if not task_layers.has_key(layer_name):
                 task_layer = createLayerSpec(layer)
-                task_layer.name = layer.getArg("layer", "default")
+                task_layer.name = layer_name
                 task_layer.command = [
                     conf.get("bp.scripts_dir") + "/env_wrapper.sh",
                     "taskrun",
