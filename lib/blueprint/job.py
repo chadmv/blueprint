@@ -3,11 +3,16 @@ The job class.
 """
 import uuid
 import os
+import logging
+
 import fileseq
 
 import blueprint.conf as conf
 from blueprint.archive import Archive
 from blueprint.exception import LayerException
+
+logger = logging.getLogger(__name__)
+
 
 class Job(object):
 
