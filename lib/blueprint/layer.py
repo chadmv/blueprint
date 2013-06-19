@@ -55,6 +55,7 @@ class Layer(object):
         self.__inputs = {}
         self.__range = args.get("range")
         self.__chunk = args.get("chunk", 1)
+        self.__flush = False
 
         self.__handleDependArg()
         self.__loadDefaultArgs()
@@ -113,17 +114,11 @@ class Layer(object):
 
     def addInput(self, name, path, attrs=None):
         self.__inputs[name] = FileIO(path, attrs)
-        # If the job doesn't have an archive yet
-        # add these at setup time.
-        if self.__job and self.__job.getArchive():
-            self.putData("inputs", self.__inputs)
+        self.__flush = True
 
     def addOutput(self, name, path, attrs=None):
         self.__outputs[name] = FileIO(path, attrs)
-        # If the job doesn't have an archive yet
-        # add these at setup time.
-        if self.__job and self.__job.getArchive():
-            self.putData("outputs", self.__outputs)
+        self.__flush = True
 
     def getSetupTasks(self):
         return list(self.__setups)
@@ -165,6 +160,9 @@ class Layer(object):
     def afterExecute(self):
         self._afterExecute()
         PluginManager.runAfterExecute(self)
+        if self.__flush and self.__job and self.__job.getArchive():
+            self.putData("inputs", self.__inputs)
+            self.putData("outputs", self.__outputs)
 
     def getTempDir(self):
         return tempfile.gettempdir()
