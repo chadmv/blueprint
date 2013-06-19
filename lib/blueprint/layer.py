@@ -95,7 +95,7 @@ class Layer(object):
         self.__job.getArchive().putData(name, data, self)
 
     def getData(self, name):
-        return self.__job.getArchive().getData(name, data, self)
+        return self.__job.getArchive().getData(name, self)
         
     def setJob(self, job):
         self.__job = job
