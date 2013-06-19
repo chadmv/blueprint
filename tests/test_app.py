@@ -25,7 +25,8 @@ class PluginManagerTests(unittest.TestCase):
         l = TestLayer("test2")
         j.addLayer(l)
         j.setup()
-        self.assertTrue(blueprint.plugins.test_plugin.Init.Setup)
+        self.assertTrue(blueprint.plugins.test_plugin.Init.LayerSetup)
+        self.assertTrue(blueprint.plugins.test_plugin.Init.JobSetup)
 
     def testBeforeExecute(self):
         """Test that before execute is being run by the plugin manager."""
