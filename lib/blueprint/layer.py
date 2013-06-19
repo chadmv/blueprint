@@ -94,8 +94,8 @@ class Layer(object):
             raise LayerException("A job archive must exist before dynamic data can be added.")
         self.__job.getArchive().putData(name, data, self)
 
-    def getData(self, name):
-        return self.__job.getArchive().getData(name, self)
+    def getData(self, name, default=None):
+        return self.__job.getArchive().getData(name, self, default)
         
     def setJob(self, job):
         self.__job = job
