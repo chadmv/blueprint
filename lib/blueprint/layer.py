@@ -139,6 +139,8 @@ class Layer(object):
         self.putData("outputs", self.__outputs)
         self._setup()
         PluginManager.runSetup(self)
+        # Don't want this to be in the permanent state
+        self.__flush = False
 
     def beforeExecute(self):
         self._beforeExecute()
@@ -160,7 +162,7 @@ class Layer(object):
     def afterExecute(self):
         self._afterExecute()
         PluginManager.runAfterExecute(self)
-        if self.__flush and self.__job and self.__job.getArchive():
+        if self.__flush:
             self.putData("inputs", self.__inputs)
             self.putData("outputs", self.__outputs)
 
