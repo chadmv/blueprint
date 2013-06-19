@@ -53,12 +53,15 @@ class FileIO(object):
         self.path = path
         self.attrs = attrs or dict()
 
+    @property
     def dirname(self):
         return os.path.dirname(self.path)
 
+    @property
     def basename(self):
         return os.path.splitext(os.path.basename(self.path))[0]
 
+    @property
     def ext(self):
         return os.path.splitext(os.path.basename(self.path))[1]
 
