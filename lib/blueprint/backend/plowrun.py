@@ -20,6 +20,7 @@ def createLayerSpec(layer):
     lspec.name = layer.getName()
     lspec.tags =  layer.getArg("tags", ["unassigned"])
     lspec.chunk = layer.getChunk()
+    lspec.isPost = layer.getArg("post", False)
 
     if layer.getArg("maxRetries"):
         lspec.maxRetries = layer.getArg("maxRetries")

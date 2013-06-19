@@ -61,11 +61,18 @@ class PluginManager(object):
                 plugin.afterInit(layer)
 
     @classmethod
-    def runSetup(cls, layer):
+    def runLayerSetup(cls, layer):
         logger.debug("Running setup plugins on %s" % layer)
         for plugin in cls.loaded:
-            if getattr(plugin, "setup", False):
-                plugin.setup(layer)
+            if getattr(plugin, "layerSetup", False):
+                plugin.layerSetup(layer)
+
+    @classmethod
+    def runJobSetup(cls, job):
+        logger.debug("Running setup plugins on %s" % job)
+        for plugin in cls.loaded:
+            if getattr(plugin, "jobSetup", False):
+                plugin.jobSetup(job)
 
     @classmethod
     def runBeforeExecute(cls, layer):

@@ -7,7 +7,8 @@ class Init:
     Layer = []
     Loaded = False
     AfterInit = False
-    Setup = False
+    LayerSetup = False
+    JobSetup = False
     BeforeExecute = False
     AfterExecute = False
     PreLaunch = False
@@ -24,9 +25,13 @@ def afterInit(layer):
     logger.info("afterInit %s plugin." %  __name__)
     Init.AfterInit = True
 
-def setup(layer):
-    logger.info("setup %s plugin." %  __name__)
-    Init.Setup = True
+def layerSetup(layer):
+    logger.info("layer setup %s plugin." %  __name__)
+    Init.LayerSetup = True
+
+def jobSetup(layer):
+    logger.info("job setup %s plugin." %  __name__)
+    Init.JobSetup = True
 
 def beforeExecute(layer):
     logger.info("beforeExecute %s plugin." %  __name__)

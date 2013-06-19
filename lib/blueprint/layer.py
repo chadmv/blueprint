@@ -134,11 +134,16 @@ class Layer(object):
         PluginManager.runAfterInit(self)
 
     def setup(self):
-        # If any inputs or outputs are set add them to the archive
+        # Run the subclass setup
+        self._setup()
+
+        # Run the plugins
+        PluginManager.runLayerSetup(self)
+        
+        # Flush any inputs/outputs to archive.
         self.putData("inputs", self.__inputs)
         self.putData("outputs", self.__outputs)
-        self._setup()
-        PluginManager.runSetup(self)
+
         # Don't want this to be in the permanent state
         self.__flush = False
 

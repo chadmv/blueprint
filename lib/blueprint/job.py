@@ -78,11 +78,15 @@ class Job(object):
 
     def setup(self):
 
+        from blueprint import PluginManager
+
         self.__archive = Archive(self)
         self.__path = self.__archive.getPath()
 
         for layer in self.__layers[0]:
             layer.setup()
+
+        PluginManager.runJobSetup(self)
 
         archive = self.__archive
         try:
