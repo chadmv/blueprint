@@ -39,17 +39,22 @@ class Archive(object):
             fp.write(yaml.dump(data))
         finally:
             fp.close()
-
-    def getData(self, name):
+    
+    def getData(self, name, layer=None, default=None):
         """
         Get data from the archive or throw an ArchiveException
         if data by the given name does not exist.
         """
         try:
-            stream = open(os.path.join(self.getPath(), name))
+            path = os.path.join(self.getPath(layer), name)
+            logger.debug("Reading in data %s from path %s" % (name, path))
+            stream = open(path, "r")
             return yaml.load(stream)
         except Exception, e:
-            raise ArchiveException(e)
+            if isinstance(default, Exception):
+                raise default
+            else:
+                return default
 
     def putFile(self, name, path):
         """ Copy a file into the job archive."""
