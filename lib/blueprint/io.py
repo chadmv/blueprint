@@ -66,7 +66,7 @@ class FileIO(object):
         return os.path.splitext(os.path.basename(self.path))[1]
 
     def __str__(self):
-        return "<FileIO %s %s %s>" % (self.path, self.attrs)
+        return "<FileIO %s %s>" % (self.path, self.attrs)
 
     def __repr__(self):
-        return "<FileIO %s %s %s>" % (self.path, self.attrs)
+        return "<FileIO %s %s>" % (self.path, self.attrs)
