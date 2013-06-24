@@ -55,7 +55,6 @@ class Layer(object):
         self.__inputs = {}
         self.__range = args.get("range")
         self.__chunk = args.get("chunk", 1)
-        self.__flush = False
 
         self.__handleDependArg()
         self.__loadDefaultArgs()
@@ -114,11 +113,9 @@ class Layer(object):
 
     def addInput(self, name, path, attrs=None):
         self.__inputs[name] = FileIO(path, attrs)
-        self.__flush = True
 
     def addOutput(self, name, path, attrs=None):
         self.__outputs[name] = FileIO(path, attrs)
-        self.__flush = True
 
     def getSetupTasks(self):
         return list(self.__setups)
@@ -140,14 +137,11 @@ class Layer(object):
         # Run the plugins
         PluginManager.runLayerSetup(self)
         
-        # Flush any inputs/outputs to archive.
-        self.putData("inputs", self.__inputs)
-        self.putData("outputs", self.__outputs)
-
-        # Don't want this to be in the permanent state
-        self.__flush = False
+        # Flush any inputs/outputs to disk.
+        self.flushIO()
 
     def beforeExecute(self):
+        self.loadIO()
         self._beforeExecute()
         PluginManager.runBeforeExecute(self)
 
@@ -167,9 +161,6 @@ class Layer(object):
     def afterExecute(self):
         self._afterExecute()
         PluginManager.runAfterExecute(self)
-        if self.__flush:
-            self.putData("inputs", self.__inputs)
-            self.putData("outputs", self.__outputs)
 
     def getTempDir(self):
         return tempfile.gettempdir()
@@ -232,6 +223,18 @@ class Layer(object):
     def setChunk(self, size):
         self.__chunk = size
 
+    def loadIO(self):
+        if self.isSetup():
+            logger.info("Loading IO: %s" % self)
+            self.__inputs = self.getData("inputs", dict())
+            self.__outputs = self.getData("outputs", dict())
+ 
+    def flushIO(self):
+        if self.isSetup():
+            logger.info("Flushing IO: %s" % self)
+            self.putData("inputs", self.__inputs)
+            self.putData("outputs", self.__outputs)
+
     def _afterInit(self):
         """
         _afterInit is called once all the layer args
@@ -290,8 +293,16 @@ class Layer(object):
                 else:
                     self.dependOn(onLayer)
 
+    def isSetup(self):
+        if not self.__job:
+            return False
+        if not self.__job.getArchive():
+            return False
+        return True
+
     def __str__(self):
         return self.getName()
+
 
 class Task(Layer):
     """
@@ -305,6 +316,7 @@ class Task(Layer):
     def _execute(self):
         pass
 
+
 class SetupTask(Task):
 
     def __init__(self, layer, **args):
@@ -317,6 +329,7 @@ class SetupTask(Task):
 
     def getParentLayer(self):
         return self.__parent
-
-
-
+    
+    def afterExecute(self):
+        super(SetupTask, self).afterExecute()
+        self.__parent.flushIO()
