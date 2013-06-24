@@ -27,8 +27,7 @@ for write_node in nuke.allNodes('Write'):
         continue
     if not only_nodes or write_node.name() in only_nodes:
         outputs.append([write_node['file'].getText(), {
-            'node': write_node.name(), 
-            'path': write_node['file'].getText(),
+            'node': write_node.name(),
             'colorspace': write_node['colorspace'].value(),
             'file_type': write_node['file_type'].value(),
             'datatype': write_node['datatype'].value(),
@@ -41,6 +40,7 @@ json.dump(outputs, open('%(tmp_data_path)s', 'w'))
 class NukeSetup(SetupTask):
     def __init__(self, parent, **kwargs):
         SetupTask.__init__(self, parent, **kwargs)
+        self.setArg("service", "setup")
 
     def _execute(self, *args):
 
@@ -74,6 +74,7 @@ class Nuke(Layer):
     def __init__(self, name, **kwargs):
         Layer.__init__(self, name, **kwargs)
         self.requireArg("script", (str,))
+	self.setArg("service", "nuke")
 
     def _setup(self):
         NukeSetup(self)
