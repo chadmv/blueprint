@@ -1,8 +1,8 @@
 import blueprint
 
-class TestLayer(blueprint.Layer):
+class TestLayer(blueprint.TaskIterator):
     def __init__(self, name, **kwargs):
-        blueprint.Layer.__init__(self, name, **kwargs)
+        blueprint.TaskIterator.__init__(self, name, **kwargs)
         self.afterInitSet = False
         self.setupSet = False
         self.beforeExecuteSet = False
@@ -18,7 +18,7 @@ class TestLayer(blueprint.Layer):
     def _beforeExecute(self):
         self.beforeExecuteSet = True
 
-    def _execute(self):
+    def _execute(self, frameset):
         self.executeSet = True
 
     def _afterExecute(self):

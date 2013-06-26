@@ -1,18 +1,18 @@
 
 import logging
 
-from blueprint.layer import Layer, Task
+from blueprint.layer import TaskIterator, Task
 from blueprint.io import system
 
 logger = logging.getLogger(__name__)
 
-class Shell(Layer):
+class Shell(TaskIterator):
 
     def __init__(self, name, **args):
         """
         Executes a shell command over a given frame range.
         """
-        Layer.__init__(self, name, **args)
+        TaskIterator.__init__(self, name, **args)
         self.requireArg("cmd", (list, tuple))
         self.setArg("service", "shell")
 

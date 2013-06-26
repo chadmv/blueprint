@@ -40,7 +40,6 @@ json.dump(outputs, open('%(tmp_data_path)s', 'w'))
 class NukeSetup(SetupTask):
     def __init__(self, parent, **kwargs):
         SetupTask.__init__(self, parent, **kwargs)
-        self.setArg("service", "setup")
 
     def _execute(self, *args):
 
@@ -69,12 +68,12 @@ class NukeSetup(SetupTask):
         for path, attrs in outputs:
             self.getParentLayer().addOutput(attrs["node"], path, attrs)
 
-class Nuke(Layer):
+class Nuke(TaskIterator):
 
     def __init__(self, name, **kwargs):
-        Layer.__init__(self, name, **kwargs)
+        TaskIterator.__init__(self, name, **kwargs)
         self.requireArg("script", (str,))
-	self.setArg("service", "nuke")
+        self.setArg("service", "nuke")
 
     def _setup(self):
         NukeSetup(self)

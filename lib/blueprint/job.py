@@ -8,6 +8,7 @@ import logging
 import fileseq
 
 import blueprint.conf as conf
+from blueprint import Layer, Task, TaskContainer
 from blueprint.archive import Archive
 from blueprint.exception import LayerException
 
@@ -45,16 +46,26 @@ class Job(object):
             raise LayerException("Layer %s does not exist." % name)
 
     def addLayer(self, layer):
-        if layer in self.__layers[0]:
-            logger.debug("The layer %s is already in the job." % layer.getName())
-            return
 
-        if self.__layers[1].has_key(layer.getName()):
-            raise LayerException("Invalid layer name: %s , duplicate name." % layer)
-        
-        self.__layers[0].append(layer)
-        self.__layers[1][layer.getName()] = layer
-        layer.setJob(self)
+        if isinstance(layer, Task):
+            task_layer_name = layer.getArg("layer", "default")
+            task_layer = self.__layers[1].get(task_layer_name)
+            if not task_layer:
+                task_layer = TaskContainer(task_layer_name)
+                task_layer.addTask(layer)
+                task_layer.setJob(self)
+                self.addLayer(task_layer)
+        else:
+            if layer in self.__layers[0]:
+                logger.debug("The layer %s is already in the job." % layer.getName())
+                return
+
+            if self.__layers[1].has_key(layer.getName()):
+                raise LayerException("Invalid layer name: %s , duplicate name." % layer)
+ 
+            self.__layers[0].append(layer)
+            self.__layers[1][layer.getName()] = layer
+            layer.setJob(self)
 
     def getLayers(self):
         return self.__layers[0]

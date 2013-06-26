@@ -6,7 +6,6 @@ import fileseq
 from collections import namedtuple
 
 import conf
-from job import Job
 from io import FileIO, system
 from app import PluginManager
 from exception import LayerException
@@ -27,6 +26,7 @@ class LayerAspect(type):
         them to the current job, of there is one.  The current job
         is set when a job is loaded via script.
         """
+        from job import Job
         layer = super(LayerAspect, cls).__call__(*args, **kwargs)
 
         if Job.Current:
@@ -38,8 +38,7 @@ class LayerAspect(type):
 
 class Layer(object):
     """
-    A base class which implments the core functionality of
-    an executable entity.
+    A base class which implements the core functionality.
     """
     __metaclass__ = LayerAspect
 
@@ -53,8 +52,6 @@ class Layer(object):
         self.__setups = []
         self.__outputs = {}
         self.__inputs = {}
-        self.__range = args.get("range")
-        self.__chunk = args.get("chunk", 1)
 
         self.__handleDependArg()
         self.__loadDefaultArgs()
@@ -145,19 +142,6 @@ class Layer(object):
         self._beforeExecute()
         PluginManager.runBeforeExecute(self)
 
-    def execute(self, frame=None):
-
-        self.beforeExecute()
-
-        if frame:
-            logger.info("Executing frame %d in layer %s" % (frame, self.getName()))
-            frameset = self.getLocalFrameSet(frame)
-            self._execute(frameset)
-        else:
-            self._execute()
-
-        self.afterExecute()
-
     def afterExecute(self):
         self._afterExecute()
         PluginManager.runAfterExecute(self)
@@ -170,58 +154,6 @@ class Layer(object):
 
     def system(self, cmd):
         system(cmd)
-
-    def getFrameRange(self):
-        frange = self.getArg("range", None)
-        if not frange:
-            return self.getJob().getFrameRange()
-        return frange
-
-    def getFrameRange(self):
-        if self.__range:
-            return self.__range
-        else:
-            return self.getJob().getFrameRange()
-
-    def getFrameSet(self):
-        return fileseq.FrameSet(self.getFrameRange())
-
-    def setFrameRange(self, frange):
-        self.__range = frange
-
-    def getLocalFrameSet(self, frame):
-        """
-        Return the local frameset when running in execute mode.
-        """
-        frameset = None
-
-        if self.getChunk() <= 0:
-            frameset = self.getFrameSet()
-        elif self.getChunk() >1:
-            result = []
-
-            full_range = self.getFrameSet()
-            end = len(full_range) - 1
-
-            idx = full_range.index(frame)
-            for i in range(idx, idx+self.getChunk()):
-                if i > end:
-                    break
-                result.append(full_range[i])
-            frameset = fileseq.FrameSet(",".join(map(str, result)))
-        else:
-            frameset = fileseq.FrameSet(str(frame))
-
-        if frameset is None:
-            raise LayerException("Unable to determine local frameset.")
-
-        return frameset
-
-    def getChunk(self):
-        return self.__chunk
-
-    def setChunk(self, size):
-        self.__chunk = size
 
     def loadIO(self):
         if self.isSetup():
@@ -246,9 +178,6 @@ class Layer(object):
         pass
 
     def _beforeExecute(self):
-        pass
-
-    def _execute(self, *args):
         pass
 
     def _afterExecute(self):
@@ -303,7 +232,6 @@ class Layer(object):
     def __str__(self):
         return self.getName()
 
-
 class Task(Layer):
     """
     Tasks are indiviudal processes with no-frame range.  Tasks must be parented
@@ -316,9 +244,93 @@ class Task(Layer):
     def _execute(self):
         pass
 
+    def execute(self):
+        self.beforeExecute()
+        try:
+            self._execute()
+        finally:
+            self.afterExecute()
+
+class TaskIterator(Layer):
+
+    def __init__(self, name, **args):
+        Layer.__init__(self, name, **args)
+        self.__range = args.get("range", "1001-1001")
+        self.__chunk = args.get("chunk", 1)
+
+    def execute(self, frame):
+        self.beforeExecute()
+        frameset = self.getLocalFrameSet(frame)
+        try:
+            self._execute(frameset)
+        finally:
+            self.afterExecute()
+
+    def _execute(self, frameset):
+        pass
+
+    def getFrameRange(self):
+        if self.__range:
+            return self.__range
+        else:
+            return self.getJob().getFrameRange()
+
+    def getFrameSet(self):
+        return fileseq.FrameSet(self.getFrameRange())
+
+    def setFrameRange(self, frange):
+        self.__range = frange
+
+    def getLocalFrameSet(self, frame):
+        """
+        Return the local frameset when running in execute mode.
+        """
+        frameset = None
+
+        if self.getChunk() <= 0:
+            frameset = self.getFrameSet()
+        elif self.getChunk() >1:
+            result = []
+
+            full_range = self.getFrameSet()
+            end = len(full_range) - 1
+
+            idx = full_range.index(frame)
+            print "idx :%d" % idx
+            for i in range(idx, idx+self.getChunk()):
+                if i > end:
+                    break
+                result.append(full_range[i])
+            frameset = fileseq.FrameSet(",".join(map(str, result)))
+        else:
+            frameset = fileseq.FrameSet(str(frame))
+
+        if frameset is None:
+            raise LayerException("Unable to determine local frameset.")
+
+        return frameset
+
+    def getChunk(self):
+        return self.__chunk
+
+    def setChunk(self, size):
+        self.__chunk = size
+
+class TaskContainer(Layer):
+    """
+    A container to hold arbitrary tasks.
+    """
+    def __init__(self, name, **args):
+        Layer.__init__(self, name, **args)
+        self.__tasks = []
+
+    def addTask(self, task):
+        self.__tasks.append(task)
 
 class SetupTask(Task):
-
+    """
+    A helper class for setting up task to run before a task iterator or other task.
+    """
     def __init__(self, layer, **args):
         Task.__init__(self, "%s_setup" % layer.getName(), **args)
         self.__parent = layer
@@ -333,3 +345,4 @@ class SetupTask(Task):
     def afterExecute(self):
         super(SetupTask, self).afterExecute()
         self.__parent.flushIO()
+

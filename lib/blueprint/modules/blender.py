@@ -4,7 +4,7 @@ import subprocess
 import json
 import logging
 
-from blueprint.layer import Layer, SetupTask
+from blueprint.layer import TaskIterator, SetupTask
 
 logger = logging.getLogger(__name__)
 
@@ -16,7 +16,7 @@ class BlenderSetup(SetupTask):
     def __init__(self, layer, **kwargs):
         SetupTask.__init__(self, layer, **kwargs)
 
-    def _execute(self, *args):
+    def _execute(self):
 
         layer = self.getLayer()
 
@@ -36,12 +36,12 @@ class BlenderSetup(SetupTask):
         for output in outputs:
             layer.addOutput(output["pass"], output["path"], output)
 
-class Blender(Layer):
+class Blender(TaskIterator):
     """
     The Blender module renders frames from a blender scene.
     """
     def __init__(self, name, **kwargs):
-        Layer.__init__(self, name, **kwargs)
+        TaskIterator.__init__(self, name, **kwargs)
         self.requireArg("scene_file", (str,))
 
         self.addInput("scene_file",

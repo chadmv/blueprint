@@ -19,7 +19,6 @@ def createLayerSpec(layer):
     lspec = plow.LayerSpec()
     lspec.name = layer.getName()
     lspec.tags =  layer.getArg("tags", ["unassigned"])
-    lspec.chunk = layer.getChunk()
     lspec.isPost = layer.getArg("post", False)
 
     if layer.getArg("maxRetries"):
@@ -59,35 +58,30 @@ def serialize(runner):
 
     for layer in job.getLayers():
 
-        if isinstance(layer, (blueprint.Task,)):
-            # Have to create a plow layer to store blueprint tasks.
-            # This would be to org
-            layer_name = layer.getArg("layer", "default")
-            if not task_layers.has_key(layer_name):
-                task_layer = createLayerSpec(layer)
-                task_layer.name = layer_name
-                task_layer.command = [
-                    conf.get("bp.scripts_dir") + "/env_wrapper.sh",
-                    "taskrun",
-                    "-debug",
-                    "-task",
-                    "%{TASK}",
-                    os.path.join(job.getPath(), "blueprint.yaml")
-                ]
-                task_layer.tasks = []
-                spec.layers.append(task_layer)
-                task_layers[layer_name] = task_layer
-            else:
-                task_layer = task_layers[layer_name]
-
-            task = plow.TaskSpec()
-            task.name = layer.getName()
-            task.depends = setupTaskDepends(job, layer) 
-            task_layer.tasks.append(task)
+        # Task containers hold tasks.
+        if isinstance(layer, blueprint.TaskContainer):
+            
+            task_cnt_spec = createLayerSpec(layer)
+            task_cnt_spec.command = [
+                conf.get("bp.scripts_dir") + "/env_wrapper.sh",
+                "taskrun",
+                "-debug",
+                "-task",
+                "%{TASK}",
+                os.path.join(job.getPath(), "blueprint.yaml")
+            ]
+            task_cnt_spec.tasks = []
+            for task in layer.getTasks():
+                task_spec = plow.TaskSpec()
+                task_spec.name = layer.getName()
+                task_spec.depends = setupTaskDepends(job, layer)
+                task_cnt_spec.tasks.append(task_spec)
+            spec.layers.append(task_cnt_spec)
         else:
             lspec = createLayerSpec(layer)
             lspec.depends = setupLayerDepends(job, layer)
             lspec.range = layer.getFrameRange()
+            lspec.chunk = layer.getChunk()
             lspec.command = [
                 conf.get("bp.scripts_dir") + "/env_wrapper.sh",
                 "taskrun",
@@ -99,7 +93,6 @@ def serialize(runner):
                 "%{FRAME}"
             ]
             spec.layers.append(lspec)
-
 
     return spec
 

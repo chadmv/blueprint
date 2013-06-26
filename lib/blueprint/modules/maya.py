@@ -10,22 +10,21 @@ logger = logging.getLogger(__name__)
 class MayaSetup(SetupTask):
     def __init__(self, parent, **kwargs):
         SetupTask.__init__(self, parent, **kwargs)
-        self.setArg("service", "setup")
 
     def _execute(self, *args):
         pass
 
-class Maya(Layer):
+class Maya(TaskIterator):
 
     def __init__(self, name, **kwargs):
-        Layer.__init__(self, name, **kwargs)
+        TaskIterator.__init__(self, name, **kwargs)
         self.requireArg("scene", (str,))
         self.setArg("service", "maya")
 
     def _execute(self, frames):
         
         output_seq = io.getOutputSeq(
-            self.getArg("scene"), self.getArg("format"))
+        self.getArg("scene"), self.getArg("format"))
 
         cmd = [
             "Render",

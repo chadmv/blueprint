@@ -13,7 +13,7 @@ class LayerTests(unittest.TestCase):
 
     def setUp(self):
         self.job = blueprint.Job("test")
-        self.layer = blueprint.Layer("test")
+        self.layer = blueprint.TaskIterator("test")
 
     def testCreateAndGet(self):
         """Create a new layer and add it to a job in non-script mode."""
@@ -80,7 +80,7 @@ class LayerTests(unittest.TestCase):
         """Test that _execute is being called."""
         l = TestLayer("test2")
         self.assertFalse(l.executeSet)
-        l.execute()
+        l.execute(1)
         self.assertTrue(l.executeSet)
 
     def testBeforeExecute(self):
