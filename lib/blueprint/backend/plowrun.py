@@ -53,13 +53,13 @@ def serialize(runner):
     }
     spec.env.update(runner.getArg("env"))
 
-    # Task layers get created to store blueprint tasks.
-    task_layers = { }
-
     for layer in job.getLayers():
 
-        # Task containers hold tasks.
-        if isinstance(layer, blueprint.TaskContainer):
+        if isinstance(layer, blueprint.Task):
+            # These are added via their task containers
+            continue
+
+        elif isinstance(layer, blueprint.TaskContainer):
             
             task_cnt_spec = createLayerSpec(layer)
             task_cnt_spec.command = [
@@ -71,12 +71,13 @@ def serialize(runner):
                 os.path.join(job.getPath(), "blueprint.yaml")
             ]
             task_cnt_spec.tasks = []
+            spec.layers.append(task_cnt_spec)
+
             for task in layer.getTasks():
                 task_spec = plow.TaskSpec()
-                task_spec.name = layer.getName()
+                task_spec.name = task.getName()
                 task_spec.depends = setupTaskDepends(job, layer)
                 task_cnt_spec.tasks.append(task_spec)
-            spec.layers.append(task_cnt_spec)
         else:
             lspec = createLayerSpec(layer)
             lspec.depends = setupLayerDepends(job, layer)

@@ -48,24 +48,27 @@ class Job(object):
     def addLayer(self, layer):
 
         if isinstance(layer, Task):
-            task_layer_name = layer.getArg("layer", "default")
+            task = layer
+            task_layer_name = task.getArg("layer", "default")
+            if task.getArg("post"):
+                task_layer_name = "%s_post" % task_layer_name
             task_layer = self.__layers[1].get(task_layer_name)
             if not task_layer:
                 task_layer = TaskContainer(task_layer_name)
-                task_layer.addTask(layer)
-                task_layer.setJob(self)
+                task_layer.setArg("post", task.getArg("post"))
                 self.addLayer(task_layer)
-        else:
-            if layer in self.__layers[0]:
-                logger.debug("The layer %s is already in the job." % layer.getName())
-                return
+            task_layer.addTask(task)
 
-            if self.__layers[1].has_key(layer.getName()):
-                raise LayerException("Invalid layer name: %s , duplicate name." % layer)
+        if layer in self.__layers[0]:
+            logger.debug("The layer %s is already in the job." % layer.getName())
+            return
+
+        if self.__layers[1].has_key(layer.getName()):
+            raise LayerException("Invalid layer name: %s , duplicate name." % layer)
  
-            self.__layers[0].append(layer)
-            self.__layers[1][layer.getName()] = layer
-            layer.setJob(self)
+        self.__layers[0].append(layer)
+        self.__layers[1][layer.getName()] = layer
+        layer.setJob(self)
 
     def getLayers(self):
         return self.__layers[0]

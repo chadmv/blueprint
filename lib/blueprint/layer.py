@@ -252,10 +252,12 @@ class Task(Layer):
             self.afterExecute()
 
 class TaskIterator(Layer):
-
+    """
+    A layer for iterating a command over a range of frame range of tasks.
+    """
     def __init__(self, name, **args):
         Layer.__init__(self, name, **args)
-        self.__range = args.get("range", "1001-1001")
+        self.__range = args.get("range")
         self.__chunk = args.get("chunk", 1)
 
     def execute(self, frame):
@@ -327,6 +329,9 @@ class TaskContainer(Layer):
     def addTask(self, task):
         self.__tasks.append(task)
 
+    def getTasks(self):
+        return self.__tasks
+
 class SetupTask(Task):
     """
     A helper class for setting up task to run before a task iterator or other task.
@@ -345,4 +350,13 @@ class SetupTask(Task):
     def afterExecute(self):
         super(SetupTask, self).afterExecute()
         self.__parent.flushIO()
+
+class PostTask(Task):
+    """
+    A helper class for setting up task to run before a task iterator or other task.
+    """
+    def __init__(self, name, **kwargs):
+        Task.__init__(self, name, **args)
+        self.setArg("post", True)
+
 
