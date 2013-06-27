@@ -1,7 +1,10 @@
 
+import logging
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.WARN)
+
 import os
 import argparse
-import logging
 import yaml
 import pprint 
 
@@ -9,7 +12,7 @@ import conf
 
 from exception import BlueprintException
 
-logger = logging.getLogger(__name__)
+
 
 __all__ = [
     "Application",
@@ -35,7 +38,7 @@ class PluginManager(object):
         try:
             plugin = __import__(module, globals(), locals(), [module])
         except ImportError, e:
-            logger.warn("Failed to load plugin: %s, %s" % (module, e))
+            logger.warn("Failed to load plugin: %s, %s", module, e)
             return
 
         try:
@@ -43,7 +46,7 @@ class PluginManager(object):
         except  AttributeError, e:
             pass
         
-        logger.debug("Initialized plugin %s" % plugin)
+        logger.debug("Initialized plugin %s", plugin)
         cls.loaded.append(plugin)
 
     @classmethod
@@ -131,10 +134,11 @@ class Application(object):
         args = self._argparser.parse_args()
 
         # Handle the common arguments.
+        rootLogger = logging.getLogger()
         if args.verbose:
-            logging.basicConfig(level=logging.INFO)
+            rootLogger.setLevel(logging.INFO)
         if args.debug:
-            logging.basicConfig(level=logging.DEBUG)
+            rootLogger.setLevel(logging.DEBUG)
         
         if args.host:
             self._runner.setArg("host", args.host)
