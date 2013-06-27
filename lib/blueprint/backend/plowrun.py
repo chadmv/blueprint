@@ -2,10 +2,13 @@ import os
 import yaml
 import getpass
 import pprint
+import logging
 
 import plow.client as plow
 import blueprint
 import blueprint.conf as conf
+
+logger = logging.getLogger(__name__)
 
 def launch(runner, spec):
     """
@@ -76,7 +79,9 @@ def serialize(runner):
             for task in layer.getTasks():
                 task_spec = plow.TaskSpec()
                 task_spec.name = task.getName()
-                task_spec.depends = setupTaskDepends(job, layer)
+                task_spec.depends=[]
+                task_spec.depends+=setupTaskDepends(job, task)
+                task_spec.depends+=setupTaskDepends(job, layer)
                 task_cnt_spec.tasks.append(task_spec)
         else:
             lspec = createLayerSpec(layer)
@@ -95,6 +100,7 @@ def serialize(runner):
             ]
             spec.layers.append(lspec)
 
+    logger.debug(str(spec))
     return spec
 
 def setupLayerDepends(job, layer):
