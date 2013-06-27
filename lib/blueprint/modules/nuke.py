@@ -5,7 +5,7 @@ import tempfile
 import json
 
 import blueprint.io as io
-from blueprint.layer import Layer, SetupTask
+from blueprint.layer import SetupTask, TaskIterator
 
 logger = logging.getLogger(__name__)
 
