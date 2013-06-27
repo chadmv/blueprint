@@ -356,7 +356,7 @@ class PostTask(Task):
     A helper class for setting up task to run before a task iterator or other task.
     """
     def __init__(self, name, **kwargs):
-        Task.__init__(self, name, **args)
+        Task.__init__(self, name, **kwargs)
         self.setArg("post", True)
 
 
