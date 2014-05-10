@@ -17,9 +17,6 @@ class MayaModuleTests(unittest.TestCase):
 
     def testSetup(self):
         self.job.setup()
-
-    def testSetup(self):
-        self.job.setup()
         self.job.getLayer("foo").execute(fileseq.FrameSet("1-1"))
 
 

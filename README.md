@@ -16,3 +16,10 @@ Also included are modules for executing arbitrary shell commands, python code, f
 
 ### Plugins
 Blueprint includes an event driven plugin system which can be used to intercept job events and execute arbitrary code.
+
+### Dependencies
+
+```
+pip install pyyaml
+pip install Fileseq
+```

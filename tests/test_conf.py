@@ -65,7 +65,7 @@ class ConfTests(unittest.TestCase):
         """
         Test the environment override feature.
         """
-        os.environ["TEST_TEST_TEST"] = "a"
+        os.environ["BLUEPRINT_TEST_TEST_TEST"] = "a"
         self.assertEquals("a", blueprint.conf.get("test.test.test"))
 
 if __name__ == "__main__":

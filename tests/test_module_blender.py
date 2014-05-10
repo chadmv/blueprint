@@ -3,7 +3,7 @@ import json
 import unittest
 import logging
 
-import blueprint.fileseq as fileseq
+import fileseq
 import blueprint.modules.blender as blender
 
 logging.basicConfig(level=logging.DEBUG)
